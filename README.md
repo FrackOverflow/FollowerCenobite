@@ -10,9 +10,10 @@ FollowerCenobite is gives a detailed view of Instagram data over time. FC is not
 2. Json Import UI
 3. Write DB Class Tests
 4. Implement Follow/Unfollow Crawler
-5. Follow/Unfollow Crawler Tests
-6. User Detail Page
-7. Import Rollback
+5. Crawler UI
+6. Follow/Unfollow Crawler Tests
+7. User Detail Page
+8. Import Rollback
 
 ## Completed Features
 
