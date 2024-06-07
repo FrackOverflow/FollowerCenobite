@@ -206,7 +206,7 @@ class fcdb():
 
     def CreateNewDB(self):
         # Create New DB
-        self.RunDbScript(f"{self.data_folder}dbCreationScript.txt")
+        self.RunDbScript(f"{self.data_folder}dbCreationScript.sql")
 
     def LoadStartupData(self):
         f = open(f"{self.data_folder}FC_Startup_Data.json")
