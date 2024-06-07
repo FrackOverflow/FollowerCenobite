@@ -1,0 +1,179 @@
+{
+    "startup_acc":[
+        [
+            0, 
+            "Default", 
+            "DEF", 
+            "Jan01_1999"
+        ],
+        [
+            1,
+            "oddfood__",
+            "OF",
+            "Jan01_1999"
+        
+        ]
+    ],
+    "startup_prefs":[
+        [
+            -1,
+            0, 
+            "ProgramData/Progress_Files/", 
+            "ProgramData/FollowerJson/", 
+            "http://www.instagram.com/"
+        ]
+    ],
+    "ui_data":{
+        "windows":[
+            {
+                "id":0,
+                "title":"Window Display Title",
+                "nickname":"template",
+                "menu_id":"id of the associated menu",
+                "subtype_id":"subtype_id of associated subtype data entries",
+                "onExit":"onExit method fires when the user exists the window",
+                "onClose":"onClose method fires when a closeEvent is detected",
+                "onCapture":"onCapture method fires when a captureEvent is detected",
+                "closeEvents":[
+                    "Events that ",
+                    "trigger onClose"
+                ],
+                "captureEvents":[
+                    "Events that ",
+                    "trigger onCapture"
+                ]
+            },
+            {
+                "id":1,
+                "title":"Preferences",
+                "nickname":"Pref",
+                "onExit":"UserExit",
+                "onClose":"UserExit",
+                "onCapture":"UserCapture",
+                "closeEvents":[
+                    "Cancel",
+                    "Overwrite"
+                ]
+            },
+            {
+                "id":2,
+                "title":"Follower Cenobite",
+                "nickname":"Main",
+                "menu_id":1,
+                "onExit":"UserShutdown",
+                "onClose":"UserShutdown",
+                "onCapture":"wMainCapture",
+                "closeEvents":[
+                    "Ok"
+                ],
+                "captureEvents":[
+                    "Preferences::dPrefs",
+                    "Quit::quit",
+                    "DFB::dCrawl_DFB",
+                    "IDFB::dCrawl_IDFB",
+                    "Following::dCrawl_Flwg",
+                    "Followers::dCrawl_Flwr"
+                ]
+            },
+            {
+                "id":3,
+                "title":"Crawler",
+                "nickname":"Crawl",
+                "onExit":"UserShutdown",
+                "onClose":"UserExit",
+                "onCapture":"UserCapture",
+                "subtype_id":0,
+                "closeEvents":[
+                    "Events that ",
+                    "trigger onClose"
+                ],
+                "captureEvents":[
+                    "Events that ",
+                    "trigger onCapture"
+                ]
+            },
+            {
+                "id":4,
+                "title":"FC Setup",
+                "nickname":"Setup",
+                "onExit":"UserShutdown",
+                "onClose":"UserExit",
+                "onCapture":"UserCapture",
+                "subtype_id":0,
+                "closeEvents":[
+                    "Start"
+                ]
+            }
+        ],
+        "menus":[
+            {
+                "id":1,
+                "name":"global_menu",
+                "menu_def": [
+                    [
+                        "File",
+                        [
+                            "Preferences::dPrefs",
+                            "Quit::quit"
+                        ]
+                    ],
+                    [
+                        "Tools", 
+                        [
+                            "Crawl Users", 
+                            [
+                                "DFB::dCrawl_DFB",
+                                "IDFB::dCrawl_IDFB",
+                                "Following::dCrawl_Flwg",
+                                "Followers::dCrawl_Flwr"
+                            ]
+                        ]
+                    ],
+                    [
+                        "About"
+                    ]
+                ]
+            }
+        ],
+
+        "window_subtypes":
+        [
+            {
+                "id":-1,
+                "subtype_id": 0,
+                "subtype":"DFB",
+                "data":{
+                    "title":"Don't Follow Back Crawler",
+                    "MainTab":"DFB"
+                }
+            },
+            {
+                "id":-1,
+                "subtype_id": 0,
+                "subtype":"IDFB",
+                "data":{
+                    "title":"I Don't Follow Back Crawler",
+                    "MainTab":"IDFB"
+                }
+            },
+            {
+                "id":-1,
+                "subtype_id": 0,
+                "subtype":"Flwg",
+                "data":{
+                    "title":"Follower Crawler",
+                    "MainTab":"Followers"
+                }
+            },
+            {
+                "id":-1,
+                "subtype_id": 0,
+                "subtype":"Flwr",
+                "data":{
+                    "title":"Following Crawler",
+                    "MainTab":"Following"
+                }
+            }
+        ]
+    }
+}

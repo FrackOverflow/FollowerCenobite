@@ -1,0 +1,8 @@
+{
+    "Application":"FollowerCrawler",
+    "Version":"TEST",
+    "DBName":"TEST_FC.db",
+    "DBCmdDelim":"%GO%",
+    "DataFolder":"ProgramData/TestData/",
+    "DateFormat":"%b%d_%Y"
+}
