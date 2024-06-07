@@ -3,6 +3,5 @@
 /ProgramData/FollowerJson
 /ProgramData/ProgressFiles
 /Programmer_Notes
-ProgramData/*.db
-/ProgramData/TestData/*.db
+*.db
 /__pycache__
