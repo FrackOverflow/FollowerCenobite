@@ -160,7 +160,7 @@ class fcdb():
     # endregion
 
     # region Query Methods
-    def _sselect(self, db_obj_type: type[dc.dbObj], fields="*", suffix=""):
+    def _sselect(self, db_obj_type: type[dc.dbObj], fields="*", suffix="") -> list[dc.dbObj]:
         """Startup select, manually types returned records with no factory (dbObjFactory is not available until prefs are loaded)"""
         qSelect = "SELECT {1} FROM {0}{2};"
         if suffix and suffix[0] != " ":
@@ -168,7 +168,7 @@ class fcdb():
         rows = self._r_query(qSelect.format(db_obj_type.get_table(), fields, suffix))
         return [db_obj_type(*x) for x in rows]
 
-    def _select(self, db_obj_type: type[dc.dbObj], fields="*", suffix=""):
+    def _select(self, db_obj_type: type[dc.dbObj], fields="*", suffix="") -> list[dc.dbObj]:
         """Run a select statement and return a list of dbObjs"""
         qSelect = "SELECT {1} FROM {0}{2};"
         if suffix and suffix[0] != " ":
@@ -181,7 +181,6 @@ class fcdb():
         qInsert = self.mk_q_insert(db_obj.get_table(), db_obj.get_row_data())
         return self._r_val_statement(*qInsert)
 
-    # Bulk Insert
     def _binsert(self, db_objs: list[dc.dbObj]):
         """SQL Bulk Insert"""
         values = []
@@ -190,7 +189,6 @@ class fcdb():
             values.append(qinsert[1])
         return self._r_val_statement(qinsert[0], values)
 
-    # Update
     def _update(self, db_obj: dc.dbObj):
         """SQL Update"""
         if not db_obj.id or db_obj.id == -1:
@@ -199,7 +197,6 @@ class fcdb():
             qupdate = self.mk_q_update(db_obj.get_table(), db_obj.get_row_data())
             return self._r_val_statement(*qupdate)
 
-    # Bulk Update
     def _bupdate(self, db_objs: list[dc.dbObj]):
         """SQL Bulk Update"""
         values = []
@@ -209,21 +206,19 @@ class fcdb():
             else:
                 qupdate = self.mk_q_update(db_obj.get_table(), db_obj.get_row_data())
                 values.append(qupdate[1])
-        return self.RunValueStatement(qupdate[0], values)
+        return self._r_val_statement(qupdate[0], values)
 
-    # Upsert
     def _upsert(self, db_obj: dc.dbObj):
         """SQL Upsert"""
-        return self.RunValueStatement(*self.mk_q_upsert(db_obj.get_table(), db_obj.get_row_data()))
+        return self._r_val_statement(*self.mk_q_upsert(db_obj.get_table(), db_obj.get_row_data()))
 
-    # Bulk Upsert
     def _bupsert(self, db_objs: list[dc.dbObj]):
         """SQL Bulk Upsert"""
         values = []
         for db_obj in db_objs:
             qupsert = self.mk_q_upsert(db_obj.get_table(), db_obj.get_row_data(), db_obj.get_id_cols())
             values.append(qupsert[1])
-        return self.RunValueStatement(qupsert[0], values)
+        return self._r_val_statement(qupsert[0], values)
     # endregion
 
     # region Create
@@ -246,7 +241,6 @@ class fcdb():
 
     def _populate_startup_data(self, startup_data):
         startup_objs = []
-        ui_data = startup_data["ui_data"]
 
         for acc in startup_data["startup_acc"]:
             c_acc = self.obj_f.ig_account(*acc)
@@ -256,46 +250,14 @@ class fcdb():
             c_pref = dc.preference(*pref)
             startup_objs.append(c_pref)
 
-        for menu in ui_data["menus"]:
-            c_menu = dc.fc_menu(
-                menu.get("id", -1),
-                menu.get("name", None),
-                menu.get("menu_def", None)
-            )
-            startup_objs.append(c_menu)
-
-        for subtype in ui_data["window_subtypes"]:
-            c_st = dc.fc_window_subtype(
-                subtype.get("id", -1),
-                subtype.get("subtype_id", None),
-                subtype.get("subtype", None),
-                subtype.get("data", None)
-            )
-            startup_objs.append(c_st)
-
-        for window in ui_data["windows"]:
-            c_win = dc.fc_window(
-                window.get("id", -1),
-                window.get("title", None),
-                window.get("nickname", None),
-                window.get("menu_id", None),
-                window.get("subtype_id", None),
-                window.get("onExit", None),
-                window.get("onClose", None),
-                window.get("onCapture", None),
-                window.get("closeEvents", None),
-                window.get("captureEvents", None)
-            )
-            startup_objs.append(c_win)
-
         for db_obj in startup_objs:
             self._insert(db_obj)
     # endregion
 
 
-class struct(dict):
+class Struct(dict):
     """
-    Struct is a dictionary you can add parameters to and access like and object.
+    Struct is a dictionary you access like and object.
     Used for compatibility, to mock complex objects when default values are required, etc.
     """
     def __getattr__(self, key):

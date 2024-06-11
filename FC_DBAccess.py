@@ -8,7 +8,7 @@ import json
 from os import remove
 from os.path import isfile
 import FC_DataClasses as dc
-from FC_DBConnect import fcdb, struct
+from FC_DBConnect import fcdb, Struct
 
 
 class dbAccessor(fcdb):
@@ -67,49 +67,6 @@ class dbAccessor(fcdb):
     def save_ig_account(self, acc: dc.ig_account):
         """ Save an IG account to DB."""
         return self._insert(acc)
-
-    def get_windows(self):
-        """ Get all window data."""
-        if not self.windows:
-            self.windows = {x.id: x for x in self._get_all_obj(dc.fc_window)}
-        return self.windows
-
-    def get_window_by_id(self, id):
-        """ Get a window using ID."""
-        if not self.windows:
-            self.get_windows()
-        return self.windows.get(id)
-
-    def get_window_by_bickname(self, nickname):
-        """ Get a window using nickname."""
-        if not self.windows:
-            self.get_windows()
-        # This comprehension looks weird cause it needs to parse the id: value format cache dicts.
-        return next((v for k, v in self.windows.items() if v.nickname == nickname), None)
-
-    def get_win_subtypes(self):
-        """ Get all window subtypes."""
-        if not self.w_subtypes:
-            self.w_subtypes = {x.id: x for x in self._get_all_obj(dc.fc_window_subtype)}
-        return self.w_subtypes
-
-    def get_win_subtype_by_id(self, id):
-        """ Get a window subtype by ID."""
-        if not self.w_subtypes:
-            self.get_win_subtypes()
-        return self.w_subtypes.get(id)
-
-    def get_menus(self):
-        """ Get all menus."""
-        if not self.menus:
-            self.menus = {x.id: x for x in self._get_all_obj(dc.fc_menu)}
-        return self.menus
-
-    def get_menuById(self, id):
-        """ Get a menu subtype by ID."""
-        if not self.menus:
-            self.get_menus()
-        return self.menus.get(id)
 
     def get_active_ig_account(self):
         """ Get the active IG account."""
