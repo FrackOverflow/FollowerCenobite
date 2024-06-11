@@ -10,22 +10,22 @@ FC focuses on publicly available information, you don't need to own the instagra
 
 ## Roadmap
 
-1. Make Virtual Environment (go to py v11 for self type-hint)
-2. Main UI
-3. Json Import UI
-4. Write DB Class Tests
-5. Implement Follow/Unfollow Crawler
-6. Crawler UI
-7. Exclusion lists!
-8. Follow/Unfollow Crawler Tests
-9. User Detail Page
-10. Import Rollback
+1. Setup Virtual Environment, document in Contributing (include python interpreter version!)
+2. Json Import UI
+3. Write DB Class Tests
+4. Implement Follow/Unfollow Crawler
+5. Crawler UI
+6. Exclusion lists!
+7. Follow/Unfollow Crawler Tests (Including tests for Json consumption)
+8. User Detail Page
+9. Import Rollback
+10. Rollback tests
 11. Cannabalize User's Followers
 12. Integrate JSON collection
 13. Warning window is cluttered
 14. Setup window should either be a single window w 2 inputs, or just username entry and set abbreviation later.
 
-## Completed Features
+## Completed
 1. DB Design
     - DB Tables
     - DB Model Classes
@@ -34,3 +34,7 @@ FC focuses on publicly available information, you don't need to own the instagra
 2. Setup UI
 3. Updated UI from PySimpleGUI to CustomTKinter
 4. Redid Setup UI
+5. Created Style Guide
+6. Updated all files to match style guide
+7. Removed PySimpleGUI data/classes from model
+8. Main UI window/navigation
