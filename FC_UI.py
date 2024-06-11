@@ -10,17 +10,20 @@ class fc_app(customtkinter.CTk):
     FC View class.
     Contains all UI logic for FC
     """
+
     def __init__(self, dba: dbAccessor):
         super().__init__()
+
+        # Window Setup
         self.dba = dba
         self.title("Follower Cenobite")
         self.geometry("700x450")
 
-        # set grid layout 1x2
+        # 1x2 Grid Layout
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(1, weight=1)
 
-        # load images with light and dark mode image
+        # Images (Light & Dark Mode!)
         image_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "FormatMe/test_images/")
         self.logo_image = customtkinter.CTkImage(Image.open(os.path.join(image_path, "CustomTkinter_logo_single.png")), size=(26, 26))
         self.large_test_image = customtkinter.CTkImage(Image.open(os.path.join(image_path, "large_test_image.png")), size=(500, 150))
@@ -32,7 +35,7 @@ class fc_app(customtkinter.CTk):
         self.add_user_image = customtkinter.CTkImage(light_image=Image.open(os.path.join(image_path, "add_user_dark.png")),
                                                      dark_image=Image.open(os.path.join(image_path, "add_user_light.png")), size=(20, 20))
 
-        # create navigation frame
+        # Navigation Frame
         self.navigation_frame = customtkinter.CTkFrame(self, corner_radius=0)
         self.navigation_frame.grid(row=0, column=0, sticky="nsew")
         self.navigation_frame.grid_rowconfigure(4, weight=1)
@@ -43,17 +46,17 @@ class fc_app(customtkinter.CTk):
 
         self.crawler_button = customtkinter.CTkButton(self.navigation_frame, corner_radius=0, height=40, border_spacing=10, text="Crawler",
                                                       fg_color="transparent", text_color=("gray10", "gray90"), hover_color=("gray70", "gray30"),
-                                                      image=self.crawler_image, anchor="w", command=self.crawler_button_event)
+                                                      image=self.crawler_image, anchor="w", command=self._crawler_button_event)
         self.crawler_button.grid(row=1, column=0, sticky="ew")
 
         self.import_button = customtkinter.CTkButton(self.navigation_frame, corner_radius=0, height=40, border_spacing=10, text="Data Import",
                                                      fg_color="transparent", text_color=("gray10", "gray90"), hover_color=("gray70", "gray30"),
-                                                     image=self.chat_image, anchor="w", command=self.import_button_event)
+                                                     image=self.chat_image, anchor="w", command=self._import_button_event)
         self.import_button.grid(row=2, column=0, sticky="ew")
 
         self.settings_button = customtkinter.CTkButton(self.navigation_frame, corner_radius=0, height=40, border_spacing=10, text="Settings",
                                                        fg_color="transparent", text_color=("gray10", "gray90"), hover_color=("gray70", "gray30"),
-                                                       image=self.add_user_image, anchor="w", command=self.settings_button_event)
+                                                       image=self.add_user_image, anchor="w", command=self._settings_button_event)
         self.settings_button.grid(row=3, column=0, sticky="ew")
 
         self.appearance_mode_menu = customtkinter.CTkOptionMenu(self.navigation_frame, values=["Light", "Dark", "System"],
@@ -64,9 +67,10 @@ class fc_app(customtkinter.CTk):
         self.crawler_frame = self._mk_crawler_frame()
         self.import_frame = self._mk_import_frame()
         self.settings_frame = self._mk_settings_frame()
-        self.select_frame_by_name("crawler")
+        self._slct_frame_by_name("crawler")
 
     def _mk_crawler_frame(self):
+        # Make the CTk frame for the crawler tab
         frame = customtkinter.CTkScrollableFrame(self, corner_radius=0, fg_color="transparent")
         frame.grid_columnconfigure(0, weight=1)
         customtkinter.CTkLabel(frame, text="CRAWLER").pack()
@@ -98,20 +102,23 @@ class fc_app(customtkinter.CTk):
         return frame
 
     def _mk_table(self, headings, data, ordered_keys):
+        # Make a table for displaying data
         # for i in range(len(headings))
         return None
 
     def _mk_import_frame(self):
+        # Make the frame for the import tab
         frame = customtkinter.CTkFrame(self, corner_radius=0, fg_color="transparent")
         customtkinter.CTkLabel(frame, text="IMPORT").pack()
         return frame
 
     def _mk_settings_frame(self):
+        # Make the frame for the settings tab
         frame = customtkinter.CTkFrame(self, corner_radius=0, fg_color="transparent")
         customtkinter.CTkLabel(frame, text="SETTINGS").pack()
         return frame
 
-    def select_frame_by_name(self, name):
+    def _slct_frame_by_name(self, name):
         # set button color for selected button
         self.crawler_button.configure(fg_color=("gray75", "gray25") if name == "crawler" else "transparent")
         self.import_button.configure(fg_color=("gray75", "gray25") if name == "import" else "transparent")
@@ -131,16 +138,16 @@ class fc_app(customtkinter.CTk):
         else:
             self.settings_frame.grid_forget()
 
-    def crawler_button_event(self):
+    def _crawler_button_event(self):
         self.select_frame_by_name("crawler")
 
-    def import_button_event(self):
+    def _import_button_event(self):
         self.select_frame_by_name("import")
 
-    def settings_button_event(self):
+    def _settings_button_event(self):
         self.select_frame_by_name("settings")
 
-    def change_appearance_mode_event(self, new_appearance_mode):
+    def _change_appearance_mode_event(self, new_appearance_mode):
         customtkinter.set_appearance_mode(new_appearance_mode)
 
 
