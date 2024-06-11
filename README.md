@@ -10,7 +10,7 @@ FC focuses on publicly available information, you don't need to own the instagra
 
 ## Roadmap
 
-0. Make Virtual Environment
+0. Make Virtual Environment (go to py v11 for self type-hint)
 1. Rework Window data 
     - Probably don't need window subtypes and events stored in DB
     - Store static data in the DB! Storing things like method names sets everything in stone T-T
