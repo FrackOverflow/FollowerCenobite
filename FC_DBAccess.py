@@ -5,6 +5,7 @@ from os.path import isfile
 import FC_DataClasses as dc
 from FC_DBConnect import fcdb, struct
 
+
 class dbAccessor(fcdb):
     def __init__(self, about="FC_About.json"):
         super(dbAccessor, self).__init__(about)
@@ -12,119 +13,122 @@ class dbAccessor(fcdb):
         self.windows = {}
         self.w_subtypes = {}
         self.ig_accs = {}
-    
-#region Low Level
-    def GetAllObj(self, T: type[dc.dbObj]):
-        return self.select(T)
-    
-    def GetObjById(self, T: type[dc.dbObj], id):
-        return self.FirstOr(None, self.select(T, suffix=f"WHERE id = {id}"))
-    
-    def GetLastRow(self, T: type[dc.dbObj]):
-        return self.FirstOr(None, self.select(T, suffix=f"ORDER BY ({', '.join(T.GetIdCols())}) DESC LIMIT 1"))
-    
-    def GetLastId(self, T: type[dc.dbObj]):
+
+    # region Low Level
+    def _get_all_obj(self, T: type[dc.dbObj]):
+        return self._select(T)
+
+    def _get_obj_by_id(self, T: type[dc.dbObj], id):
+        return self.first_or(None, self._select(T, suffix=f"WHERE id = {id}"))
+
+    def _get_last_row(self, T: type[dc.dbObj]):
+        return self.first_or(None, self._select(T, suffix=f"ORDER BY ({', '.join(T.get_id_cols())}) DESC LIMIT 1"))
+
+    def _get_last_id(self, T: type[dc.dbObj]):
         firstId = struct()
         firstId.id = 0
-        return self.FirstOr(firstId, self.select(T, suffix=f"ORDER BY ({', '.join(T.GetIdCols())}) DESC LIMIT 1")).id
-#endregion
+        return self.first_or(firstId, self._select(T, suffix=f"ORDER BY ({', '.join(T.get_id_cols())}) DESC LIMIT 1")).id
+    # endregion
 
-#region Cached
+    # region Cached
     # Gets currently active preferences
-    def GetActivePrefs(self) -> dc.preference:
+    def get_active_prefs(self) -> dc.preference:
         if not hasattr(self, "active_prefs"):
-            self.active_prefs = self.FirstOr(None, self.select(dc.preference, suffix="ORDER BY id DESC"))
+            self.active_prefs = self.first_or(None, self._select(dc.preference, suffix="ORDER BY id DESC"))
         return self.active_prefs
-    
+
     # Updates prefs in DB and sets active prefs on DB connection and DB Obj factory
-    def SaveActivePrefs(self, prefs):
-        self.SetNewPrefs(prefs)
-        return self.update(prefs)
-    
-    def GetIgAccounts(self):
+    def save_active_prefs(self, prefs):
+        self.set_new_prefs(prefs)
+        return self._update(prefs)
+
+    def get_ig_accounts(self):
         if not self.ig_accs:
-            self.ig_accs = {x.id: x for x in self.GetAllObj(dc.ig_account)}
+            self.ig_accs = {x.id: x for x in self._get_all_obj(dc.ig_account)}
         return self.ig_accs
-    
-    def GetIgAccountById(self, id):
+
+    def get_ig_account_by_id(self, id):
         if not self.ig_accs:
-            self.GetIgAccounts()
+            self.get_ig_accounts()
         return self.ig_accs.get(id)
-    
-    def GetWindows(self):
+
+    def save_ig_account(self, acc: dc.ig_account):
+        return self._insert(acc)
+
+    def get_windows(self):
         if not self.windows:
-            self.windows = {x.id: x for x in self.GetAllObj(dc.fc_window)}
+            self.windows = {x.id: x for x in self._get_all_obj(dc.fc_window)}
         return self.windows
-    
-    def GetWindowById(self, id):
+
+    def get_window_by_id(self, id):
         if not self.windows:
-            self.GetWindows()
+            self.get_windows()
         return self.windows.get(id)
-    
-    def GetWindowByNickname(self, nickname):
+
+    def get_window_by_bickname(self, nickname):
         if not self.windows:
-            self.GetWindows()
+            self.get_windows()
         # This comprehension looks weird cause it needs to parse the id: value format cache dicts.
         return next((v for k, v in self.windows.items() if v.nickname == nickname), None)
 
-    def GetWSubtypes(self):
+    def get_win_subtypes(self):
         if not self.w_subtypes:
-            self.w_subtypes = {x.id: x for x in self.GetAllObj(dc.fc_window_subtype)}
+            self.w_subtypes = {x.id: x for x in self._get_all_obj(dc.fc_window_subtype)}
         return self.w_subtypes
-    
-    def GetWSubtypeById(self, id):
-        if not self.w_subtypes:
-            self.GetWSubtypes()
-        return self.w_subtypes.get(id)
-    
-    def GetMenus(self):
-        if not self.menus:
-            self.menus = {x.id: x for x in self.GetAllObj(dc.fc_menu)}
-        return self.menus
-    
-    def GetMenuById(self, id):
-        if not self.menus:
-            self.GetMenus()
-        return self.menus.get(id)
-    
-    def GetActiveIgAccount(self):
-        if not self.active_prefs:
-            self.GetActivePrefs()
-        if not self.ig_accs:
-            self.GetIgAccounts()
-        return self.ig_accs.get(self.active_prefs.default_acc_id)
-#endregion
 
-#region Not Cached
-    def GetFollowsByAcc(self, acc):
-        return self.select(dc.follow, suffix=f"WHERE acc_id = {acc.id}")
-    
-    def GetLastFollowsByAcc(self, acc: dc.ig_account) -> list[dc.last_follow]:
-        return self.select(dc.last_follow, suffix=f"WHERE acc_id = {acc.id}")
-    
-    def GetFlwsByLastFlw(self, lf: dc.last_follow):
+    def get_win_subtype_by_id(self, id):
+        if not self.w_subtypes:
+            self.get_win_subtypes()
+        return self.w_subtypes.get(id)
+
+    def get_menus(self):
+        if not self.menus:
+            self.menus = {x.id: x for x in self._get_all_obj(dc.fc_menu)}
+        return self.menus
+
+    def get_menuById(self, id):
+        if not self.menus:
+            self.get_menus()
+        return self.menus.get(id)
+
+    def get_active_ig_account(self):
+        if not self.active_prefs:
+            self.get_active_prefs()
+        if not self.ig_accs:
+            self.get_ig_accounts()
+        return self.ig_accs.get(self.active_prefs.default_acc_id)
+    # endregion
+
+    # region Not Cached
+    def get_follows_by_acc(self, acc):
+        return self._select(dc.follow, suffix=f"WHERE acc_id = {acc.id}")
+
+    def get_last_follows_by_acc(self, acc: dc.ig_account) -> list[dc.last_follow]:
+        return self._select(dc.last_follow, suffix=f"WHERE acc_id = {acc.id}")
+
+    def get_flws_by_last_flw(self, lf: dc.last_follow):
         flws = []
         if lf.last_follower_id:
-            flws.append(self.select(dc.follow, suffix=f"WHERE id = {lf.last_follower_id}"))
+            flws.append(self._select(dc.follow, suffix=f"WHERE id = {lf.last_follower_id}"))
         if lf.last_following_id:
             if lf.last_follower_id != lf.last_following_id:
-                flws.append(self.select(dc.follow, suffix=f"WHERE id = {lf.last_following_id}"))
+                flws.append(self._select(dc.follow, suffix=f"WHERE id = {lf.last_following_id}"))
         return flws
-    
-    def GetMostRecentFollowsByAcc(self, acc):
-        lfs = self.GetLastFollowsByAcc(acc)
+
+    def get_newest_follows_by_acc(self, acc) -> list[dc.follow]:
+        lfs = self.get_last_follows_by_acc(acc)
         recent_flws = []
         for lf in lfs:
-            flws = self.GetFlwsByLastFlw(lf)
+            flws = self.get_flws_by_last_flw(lf)
             if len(flws) == 1:
                 recent_flws.append(flws[0])
             if len(flws) == 2:
                 recent_flws.append(flws[0] if flws[0] > flws[1] else flws[1])
         return recent_flws
-#endregion
+    # endregion
 
-#region JsonProcessing
-    def MunchFollowData(self, follower_json, following_json, acc_id, date):
+    # region JsonProcessing
+    def munch_follow_data(self, follower_json, following_json, acc_id, date):
         # Load Json Data
         f_flwr = open(follower_json, encoding="utf-8-sig")
         f_flwg = open(following_json, encoding="utf-8-sig")
@@ -139,7 +143,7 @@ class dbAccessor(fcdb):
         # Initialize variables for parsing last follows
         commit_follows = []
         commit_last_follows = []
-        last_id = self.GetLastId(dc.follow) 
+        last_id = self.get_last_id(dc.follow)
         for user in all_known:
             last_id += 1
             isflwr = False
@@ -156,39 +160,39 @@ class dbAccessor(fcdb):
             commit_follows.append(follow)
 
             # If last follow is found compare follow date with current
-            existing_lf = self.select(dc.last_follow, suffix=f"WHERE username = {self.colData(user)} AND acc_id = {acc_id}")
+            existing_lf = self._select(dc.last_follow, suffix=f"WHERE username = {self._col_data(user)} AND acc_id = {acc_id}")
             if len(existing_lf) == 1:
                 ex_lf = existing_lf[0]
                 if ex_lf.last_follower_id:
-                    f_lFlwr = self.select(dc.follow, suffix=f"WHERE id = {ex_lf.last_follower_id}")[0]
+                    f_lFlwr = self._select(dc.follow, suffix=f"WHERE id = {ex_lf.last_follower_id}")[0]
                     if f_lFlwr < follow:
                         ex_lf.last_follower_id = follow.id
                 if ex_lf.last_following_id:
-                    f_lFlwg = self.select(dc.follow, suffix=f"WHERE id = {ex_lf.last_following_id}")[0]
+                    f_lFlwg = self._select(dc.follow, suffix=f"WHERE id = {ex_lf.last_following_id}")[0]
                     if f_lFlwg < follow:
                         ex_lf.last_following_id = follow.id
 
                 # Only update if newer is found.
                 if f_lFlwr < follow or f_lFlwg < follow:
                     commit_last_follows.append(ex_lf)
-                    
+   
             # If no existing last follow the user is new
             if len(existing_lf) == 0:
                 commit_last_follows.append(self.obj_f.last_follow(user, acc_id, lFlwgId, lFlwrId))
             if len(existing_lf) > 1:
                 print(f"Constraint Violation: Multiple Last Follows were found for user/account pair {user}, {acc_id}")
-        
-        self.binsert(commit_follows)
-        self.bupsert(commit_last_follows) # We could make this quicker by determining which records are inserts vs updates and doing 2 bulk calls. 
-    #endregion
+  
+        self._binsert(commit_follows)
+        self._bupsert(commit_last_follows)  # We could make this quicker by determining which records are inserts vs updates and doing 2 bulk calls. 
+    # endregion
+
 
 if __name__ == "__main__":
     dbname = "ProgramData\TestData\TEST_FC.db"
     try:
         db = dbAccessor("ProgramData/TestData/TEST_FC_About.json")
-        db.MunchFollowData("ProgramData\FollowerJson\OF_Flwg_May30_2024.json", "ProgramData\FollowerJson\OF_Flwr_May30_2024.json", 1, datetime.today().strftime("%b%d_%Y"))
-        db.MunchFollowData("ProgramData\FollowerJson\OF_Flwg_May31_2024.json", "ProgramData\FollowerJson\OF_Flwr_May31_2024.json", 1, datetime.today().strftime("%b%d_%Y"))
+        db.munch_follow_data("ProgramData\FollowerJson\OF_Flwg_May30_2024.json", "ProgramData\FollowerJson\OF_Flwr_May30_2024.json", 1, datetime.today().strftime("%b%d_%Y"))
+        db.munch_follow_data("ProgramData\FollowerJson\OF_Flwg_May31_2024.json", "ProgramData\FollowerJson\OF_Flwr_May31_2024.json", 1, datetime.today().strftime("%b%d_%Y"))
     finally:
         if isfile(dbname):
             remove(dbname)
-
