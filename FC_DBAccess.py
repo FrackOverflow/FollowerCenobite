@@ -8,7 +8,7 @@ import json
 from os import remove
 from os.path import isfile
 import FC_DataClasses as dc
-from FC_DBConnect import fcdb, struct
+from FC_DBConnect import fcdb, Struct
 
 
 class dbAccessor(fcdb):
