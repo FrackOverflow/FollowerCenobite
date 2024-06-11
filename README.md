@@ -9,22 +9,22 @@ Growing an instagram following requires managing a lot of relationships. After u
 FC focuses on publicly available information, you don't need to own the instagram account you are analyzing. However if you do decide to collect information for FC, its recommended that you don't do it from the account you are analyzing, or any other account linked to it. I have never run into trouble but even better if you can't be traced at all :)
 
 ## Roadmap
-1. Replace PySimpleGUI
-2. Rework Window data 
+1. Rework Window data 
     - Probably don't need window subtypes and events stored in DB
     - Store static data in the DB! Storing things like method names sets everything in stone T-T
-3. Redo Setup UI
-4. Main UI
-5. Json Import UI
-6. Write DB Class Tests
-7. Implement Follow/Unfollow Crawler
-8. Crawler UI
-9. Exclusion lists!
-10. Follow/Unfollow Crawler Tests
-11. User Detail Page
-12. Import Rollback
-13. Cannabalize User's Followers
-14. Integrate JSON collection
+2. Main UI
+3. Json Import UI
+4. Write DB Class Tests
+5. Implement Follow/Unfollow Crawler
+6. Crawler UI
+7. Exclusion lists!
+8. Follow/Unfollow Crawler Tests
+9. User Detail Page
+10. Import Rollback
+11. Cannabalize User's Followers
+12. Integrate JSON collection
+13. Warning window is cluttered
+14. Setup window should either be a single window w 2 inputs, or just username entry and set abbreviation later.
 
 ## Completed Features
 1. DB Design
@@ -33,3 +33,5 @@ FC focuses on publicly available information, you don't need to own the instagra
     - DB Connection & Query classes
     - DB Auto-init
 2. Setup UI
+3. Updated UI from PySimpleGUI to CustomTKinter
+4. Redid Setup UI
