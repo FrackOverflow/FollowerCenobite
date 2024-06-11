@@ -1,6 +1,10 @@
 # FC Style Guide
 Unless specifically stated, FC follows the standard set out in [PEP 8](https://peps.python.org/pep-0008/#introduction).
 
+## Linting
+FC using flake8 for linting. The flake8 configuration in setupconfig has the following rules:
+Ignore E501 - Lines must be <79 characters long
+
 ## General
 ### Naming
 Methods & Functions:
