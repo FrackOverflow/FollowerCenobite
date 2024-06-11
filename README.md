@@ -9,6 +9,8 @@ Growing an instagram following requires managing a lot of relationships. After u
 FC focuses on publicly available information, you don't need to own the instagram account you are analyzing. However if you do decide to collect information for FC, its recommended that you don't do it from the account you are analyzing, or any other account linked to it. I have never run into trouble but even better if you can't be traced at all :)
 
 ## Roadmap
+
+0. Make Virtual Environment
 1. Rework Window data 
     - Probably don't need window subtypes and events stored in DB
     - Store static data in the DB! Storing things like method names sets everything in stone T-T
