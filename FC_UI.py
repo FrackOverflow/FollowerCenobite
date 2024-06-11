@@ -3,7 +3,6 @@ import os
 from PIL import Image
 from datetime import datetime
 from FC_DBAccess import dbAccessor
-import FC_DataClasses as dc
 
 
 class fc_app(customtkinter.CTk):
@@ -18,12 +17,12 @@ class fc_app(customtkinter.CTk):
         self.grid_columnconfigure(1, weight=1)
 
         # load images with light and dark mode image
-        image_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "FormatMe/test_images")
+        image_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "FormatMe/test_images/")
         self.logo_image = customtkinter.CTkImage(Image.open(os.path.join(image_path, "CustomTkinter_logo_single.png")), size=(26, 26))
         self.large_test_image = customtkinter.CTkImage(Image.open(os.path.join(image_path, "large_test_image.png")), size=(500, 150))
         self.image_icon_image = customtkinter.CTkImage(Image.open(os.path.join(image_path, "image_icon_light.png")), size=(20, 20))
         self.crawler_image = customtkinter.CTkImage(light_image=Image.open(os.path.join(image_path, "home_dark.png")),
-                                                 dark_image=Image.open(os.path.join(image_path, "home_light.png")), size=(20, 20))
+                                                    dark_image=Image.open(os.path.join(image_path, "home_light.png")), size=(20, 20))
         self.chat_image = customtkinter.CTkImage(light_image=Image.open(os.path.join(image_path, "chat_dark.png")),
                                                  dark_image=Image.open(os.path.join(image_path, "chat_light.png")), size=(20, 20))
         self.add_user_image = customtkinter.CTkImage(light_image=Image.open(os.path.join(image_path, "add_user_dark.png")),
@@ -39,18 +38,18 @@ class fc_app(customtkinter.CTk):
         self.navigation_frame_label.grid(row=0, column=0, padx=20, pady=20)
 
         self.crawler_button = customtkinter.CTkButton(self.navigation_frame, corner_radius=0, height=40, border_spacing=10, text="Crawler",
-                                                   fg_color="transparent", text_color=("gray10", "gray90"), hover_color=("gray70", "gray30"),
-                                                   image=self.crawler_image, anchor="w", command=self.crawler_button_event)
+                                                      fg_color="transparent", text_color=("gray10", "gray90"), hover_color=("gray70", "gray30"),
+                                                      image=self.crawler_image, anchor="w", command=self.crawler_button_event)
         self.crawler_button.grid(row=1, column=0, sticky="ew")
 
         self.import_button = customtkinter.CTkButton(self.navigation_frame, corner_radius=0, height=40, border_spacing=10, text="Data Import",
-                                                      fg_color="transparent", text_color=("gray10", "gray90"), hover_color=("gray70", "gray30"),
-                                                      image=self.chat_image, anchor="w", command=self.import_button_event)
+                                                     fg_color="transparent", text_color=("gray10", "gray90"), hover_color=("gray70", "gray30"),
+                                                     image=self.chat_image, anchor="w", command=self.import_button_event)
         self.import_button.grid(row=2, column=0, sticky="ew")
 
         self.settings_button = customtkinter.CTkButton(self.navigation_frame, corner_radius=0, height=40, border_spacing=10, text="Settings",
-                                                      fg_color="transparent", text_color=("gray10", "gray90"), hover_color=("gray70", "gray30"),
-                                                      image=self.add_user_image, anchor="w", command=self.settings_button_event)
+                                                       fg_color="transparent", text_color=("gray10", "gray90"), hover_color=("gray70", "gray30"),
+                                                       image=self.add_user_image, anchor="w", command=self.settings_button_event)
         self.settings_button.grid(row=3, column=0, sticky="ew")
 
         self.appearance_mode_menu = customtkinter.CTkOptionMenu(self.navigation_frame, values=["Light", "Dark", "System"],
@@ -62,7 +61,7 @@ class fc_app(customtkinter.CTk):
         self.import_frame = self._mk_import_frame()
         self.settings_frame = self._mk_settings_frame()
         self.select_frame_by_name("crawler")
-    
+
     def _mk_crawler_frame(self):
         frame = customtkinter.CTkScrollableFrame(self, corner_radius=0, fg_color="transparent")
         frame.grid_columnconfigure(0, weight=1)
@@ -74,8 +73,8 @@ class fc_app(customtkinter.CTk):
         f_idfb = self.crawler_tabview.add("IDFB")
 
         # Get follower data
-        selectedAcc = self.dba.GetActiveIgAccount()
-        follows = self.dba.GetMostRecentFollowsByAcc(selectedAcc)
+        selectedAcc = self.dba.get_active_ig_account()
+        follows = self.dba.get_newest_follows_by_acc(selectedAcc)
         if len(follows) > 0:
             headings = []
             dfb = [f for f in follows if f.dfb()][0:100]
@@ -88,10 +87,10 @@ class fc_app(customtkinter.CTk):
         # keys = dc.follow.
         #for (dataview, frame) in [(flwr, f_flwr), (flwg, f_flwg), (dfb, f_dfb), (idfb, f_idfb)]:
             #if dataview:
-                #self._mk_table(headings, dataview)
+                #self._mk_table(headings, dataview, [])
             #else:
-                #self._mk_table(headings)
-        
+                #self._mk_table(headings, [], [])
+
         return frame
 
     def _mk_table(self, headings, data, ordered_keys):
@@ -102,7 +101,7 @@ class fc_app(customtkinter.CTk):
         frame = customtkinter.CTkFrame(self, corner_radius=0, fg_color="transparent")
         customtkinter.CTkLabel(frame, text="IMPORT").pack()
         return frame
-    
+
     def _mk_settings_frame(self):
         frame = customtkinter.CTkFrame(self, corner_radius=0, fg_color="transparent")
         customtkinter.CTkLabel(frame, text="SETTINGS").pack()
@@ -140,17 +139,20 @@ class fc_app(customtkinter.CTk):
     def change_appearance_mode_event(self, new_appearance_mode):
         customtkinter.set_appearance_mode(new_appearance_mode)
 
+
 # Setup active account from prefs, or prompt the user if none exists
-def setup(dba):
+def setup(dba: dbAccessor):
     active_acc = None
-    prefs = dba.GetActivePrefs()
+    prefs = dba.get_active_prefs()
 
     # Lookup active account if its not set to default
     if prefs.default_acc_id != 0:
-        active_acc = dba.GetActiveIgAccount()
+        active_acc = dba.get_active_ig_account()
 
     # Show Setup window if the account is missing or default
     if prefs.default_acc_id == 0 or not active_acc:
+
+        # Get ig account info with popup dialogs
         usrname = customtkinter.CTkInputDialog(text="Enter your Instagram Username:", title="FC User Setup")
         usrname = usrname.get_input()
         if not usrname:
@@ -159,17 +161,23 @@ def setup(dba):
         usr_abbrv = usr_abbrv.get_input()
         if not usr_abbrv:
             return False
+
+        # Save new ig account to database
         startAcc = dba.obj_f.ig_account(-1, usrname, usr_abbrv, datetime.today().strftime(dba.date_format))
-        startAcc.id = dba.insert(startAcc)
-        prefs.default_acc_id = startAcc.id
-        active_acc = startAcc
-        dba.SaveActivePrefs(prefs)
-        
+        startAcc.id = dba.save_ig_account(startAcc)
+        if startAcc.id <= 0:
+            warning(f"There was an issue saving {usrname} to the database", "Database Error")
+        else:
+            active_acc = startAcc
+            prefs.default_acc_id = startAcc.id
+            dba.save_active_prefs(prefs)
+
     # Check if an active account exists and the ID is not default (0) or null (-1)
     if active_acc and active_acc.id > 0:
         return True
     else:
         return False
+
 
 def warning(body, title):
     window = customtkinter.CTk()
