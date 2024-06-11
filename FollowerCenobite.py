@@ -1,15 +1,14 @@
 from FC_DBAccess import dbAccessor
-from FC_UI import MainApp, setup, warning
-
+from FC_UI import fc_app, setup, warning
 
 class FollowerCenobite():
     def main(self):
         self.dba = dbAccessor()
         if setup(self.dba):
-            MainApp(self.dba)
+            app = fc_app(self.dba)
+            app.mainloop()
         else:
             warning("Setup Failed, please try again.", "FC Setup Failed")
-
         
 if __name__ == "__main__":
     fc = FollowerCenobite()
