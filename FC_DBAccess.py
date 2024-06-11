@@ -209,15 +209,15 @@ class dbAccessor(fcdb):
                 print(f"Constraint Violation: Multiple Last Follows were found for user/account pair {user}, {acc_id}")
 
         self._binsert(commit_follows)
-        self._bupsert(commit_last_follows)  
+        self._bupsert(commit_last_follows)
         # We could make this quicker by determining which records are inserts vs updates and doing 2 bulk calls.
-        
+
         # We currently don't mark users as "unfollowed" if there is no record in follower/following, but this could happen if we both unfollow eachother
         # To track this we need to track when the last import for a user was, get it when we start the import, and look for any "follow" records with
         # the previous import date that don't show up in follower or following. IS THERE ANY BENEFIT TO TRACKING THIS??
 
         # When we import we should create a new GUID and save it in an "imports" table which will track when a follow record was imported
-        # To roll back, we can show a list of imports and let the user select an import to rollback to. We should then delete the 
+        # To roll back, we can show a list of imports and let the user select an import to rollback to. We should then delete the
     # endregion
 
 
