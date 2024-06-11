@@ -323,7 +323,7 @@ class last_follow(dbObj):
 # endregion
 
 
-class dbObj_factory():
+class dbObjFactory():
     """
     Factory for creating dbObj using active prefs and dateformat
     """
