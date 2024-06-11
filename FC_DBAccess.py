@@ -1,3 +1,8 @@
+"""
+FC_DBAccess
+
+Contains controller classes for abstracted interaction with the DB
+"""
 from datetime import datetime
 import json
 from os import remove
@@ -9,7 +14,7 @@ from FC_DBConnect import fcdb, struct
 class dbAccessor(fcdb):
     """
     FC Controller Class
-    Contains abstracted methods for updating model
+    Contains high-level methods for updating model with dbObj classes
     """
 
     def __init__(self, about="FC_About.json"):

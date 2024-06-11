@@ -1,3 +1,9 @@
+"""
+FC_DataClasses
+
+Contains Model classes for interacting with the database
+"""
+
 from datetime import datetime
 from functools import total_ordering
 import json
@@ -165,7 +171,8 @@ class DateComparable(dbObj):
 # region Meta Types
 class preference(dbObj):
     """
-    A Preference object from the database.
+    User Preference settings for FC.
+    Represents a preference record from the database.
     """
     TABLE = "preferences"
 
@@ -259,6 +266,10 @@ class fc_window_subtype(dbObj):
 
 # region Entity Classes
 class follow(DateComparable):
+    """
+    FC Follow datapoint
+    Represents a follow record from the database
+    """
     TABLE = "follow"
 
     def __init__(self,
@@ -289,6 +300,10 @@ class follow(DateComparable):
 
 
 class ig_account(DateComparable):
+    """
+    FC Instagram Account
+    Represents an ig_account record from the database
+    """
     TABLE = "ig_account"
     date_field = "last_update"
 
@@ -306,6 +321,10 @@ class ig_account(DateComparable):
 
 
 class last_follow(dbObj):
+    """
+    FC Instagram Account
+    Represents an last_follows record from the database
+    """
     TABLE = "last_follows"
     ID_COLS = ["username", "acc_id"]
 
