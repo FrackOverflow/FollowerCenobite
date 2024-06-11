@@ -1,3 +1,11 @@
+"""
+FollowerCenobite
+
+FollowerCenobite is gives a detailed view of Instagram data over time.
+FC is not a bot, it consumes JSON data about follows/likes and allows
+you to drill down and see your relationship with users across multiple
+accounts.
+"""
 from FC_DBAccess import dbAccessor
 from FC_UI import fc_app, setup, warning
 
