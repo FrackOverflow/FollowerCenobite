@@ -39,32 +39,3 @@ CREATE TABLE preferences (
     FOREIGN KEY (default_acc_id) REFERENCES ig_account (id)
 );
 %GO%
-
-CREATE TABLE fc_menu (
-    id INTEGER PRIMARY KEY,
-    name TEXT,
-    menu_def TEXT
-);
-%GO%
-
-CREATE TABLE window_subtype (
-    id INTEGER PRIMARY KEY,
-    subtype_id INTEGER,
-    subtype TEXT,
-    data TEXT
-)
-%GO%
-
-CREATE TABLE fc_window (
-    id INTEGER PRIMARY KEY,
-    title TEXT,
-    nickname TEXT UNIQUE,
-    menu_id INTEGER,
-    subtype_id INTEGER,
-    onExit TEXT,
-    onClose TEXT,
-    onCapture TEXT,
-    closeEvents TEXT,
-    captureEvents TEXT,
-    FOREIGN KEY (menu_id) REFERENCES fc_menu (id)
-)
