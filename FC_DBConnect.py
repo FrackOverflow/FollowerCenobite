@@ -1,3 +1,8 @@
+"""
+FC_DBConnect
+
+Low level DB access and setup logic
+"""
 from os import remove, getcwd
 from os.path import isfile, join
 import json
@@ -6,6 +11,10 @@ import FC_DataClasses as dc
 
 
 class fcdb():
+    """
+    FCDB Connection Class
+    Provides DB setup and low level access
+    """
     date_format: str
     cmd_delim: str
     db_name: str
@@ -21,12 +30,14 @@ class fcdb():
         self._set_db_and_prefs()
 
     def set_new_prefs(self, prefs, date_fmt=""):
+        """ Set new preferences & date format on DB connection and object factory."""
         self.active_prefs = prefs
         if date_fmt:
             self.date_format = date_fmt
         self.obj_f.set_new_prefs(prefs, date_fmt)
 
     def _set_db_and_prefs(self):
+        # sets DB connection and preferences, creates DB if it isn't found
         if not isfile(self.db_name):
             print(f"No FCDB was found, initializing a new database at: \n\t---> {join(getcwd(), self.db_name)}")
             self._create_new_db()
@@ -38,14 +49,14 @@ class fcdb():
             self.obj_f = dc.dbObjFactory(self.active_prefs, self.date_format)
 
     # region Helpers
-    # Gets the first value from a list or if its empty returns None
     @staticmethod
     def first_or(default, result):
+        """ Gets the first value from a list or if its empty returns None."""
         return result[0] if result else default
 
-    # Returns a string in format (?, ?, ?) where num = number of question marks
     @staticmethod
     def _mk_value_string(num: int) -> str:
+        # Returns a string in format (?, ?, ?) where num = number of question marks
         qs = []
         for i in range(0, num):
             qs.append("?")
@@ -53,6 +64,7 @@ class fcdb():
 
     @staticmethod
     def _col_data(value):
+        # Returns provided python data formatted to a SQL string
         if isinstance(value, str):
             return f'"{value}"'
         if isinstance(value, int):
@@ -62,14 +74,17 @@ class fcdb():
 
     @staticmethod
     def _mk_col_set(cols: dict):
+        # Returns the provided columns in format "key1 = ?, key2 = ?,..., keyn = ?"
         return ", ".join([f"{c} = ?" for c in cols])
 
     @staticmethod
     def _mk_upsert_colset(cols: dict):
+        # Returns the provided columns in format "key1 = excluded.key1, key2 = excluded.key2,..., keyn = excluded.keyn"
         return ", ".join([f"{c} = excluded.{c}" for c in cols])
 
     @staticmethod
     def _type_list(rows, db_obj: dc.dbObj):
+        # Returns a list where each entry is an entry from rows typed to db_obj
         objs = []
         for row in rows:
             objs.append(db_obj(*row))
@@ -78,6 +93,7 @@ class fcdb():
 
     # region Run
     def _r_query(self, statement):
+        # Run a query on the database and get all rows
         try:
             with sqlite3.connect(self.db_name) as conn:
                 cursor = conn.cursor()
@@ -87,6 +103,7 @@ class fcdb():
             print(e)
 
     def _r_val_statement(self, statement, values):
+        # Run a statement on the database repeatedly using entries in "values", return the last row ID
         try:
             with sqlite3.connect(self.db_name) as conn:
                 cursor = conn.cursor()
@@ -100,6 +117,7 @@ class fcdb():
             print(e)
 
     def _r_statement(self, statement):
+        # Run a query on the database and get the last row ID
         try:
             with sqlite3.connect(self.db_name) as conn:
                 cursor = conn.cursor()
@@ -110,6 +128,7 @@ class fcdb():
             print(e)
 
     def r_cmds(self, statements):
+        # Run a set of statements on the database
         try:
             with sqlite3.connect(self.db_name) as conn:
                 cursor = conn.cursor()
@@ -123,14 +142,17 @@ class fcdb():
     # region Query Strings
     # Each method makes a corresponding query statment string from supplied data
     def mk_q_insert(self, table, row_data):
+        """ Make insert query."""
         fields = ",".join(row_data.keys())
         return (f"INSERT INTO {table} ({fields}) VALUES{self._mk_value_string(len(row_data))};", tuple(row_data.values()))
 
     def mk_q_update(self, table, row_data):
+        """ Make update query."""
         row_id = row_data.pop("id")
         return (f"UPDATE {table} SET {self._mk_col_set(row_data)} WHERE id = {row_id};", tuple(row_data.values()))
 
     def mk_q_upsert(self, table, row_data, id_cols):
+        """ Make upsert query."""
         # Unwrap the query string and remove trailing semicolon
         qinsert = self.mk_q_insert(table, row_data)[0][:-1]
         # Create Upsert query from supplied data and insert query
@@ -138,29 +160,30 @@ class fcdb():
     # endregion
 
     # region Query Methods
-    # Startup select, manually types returned records with no factory (dbObjFactory is not available until prefs are loaded)
     def _sselect(self, db_obj_type: type[dc.dbObj], fields="*", suffix=""):
+        """Startup select, manually types returned records with no factory (dbObjFactory is not available until prefs are loaded)"""
         qSelect = "SELECT {1} FROM {0}{2};"
         if suffix and suffix[0] != " ":
             suffix = f" {suffix}"
         rows = self._r_query(qSelect.format(db_obj_type.get_table(), fields, suffix))
         return [db_obj_type(*x) for x in rows]
 
-    # Run a select statement and return a list of dbObjs created with the active factory
     def _select(self, db_obj_type: type[dc.dbObj], fields="*", suffix=""):
+        """Run a select statement and return a list of dbObjs"""
         qSelect = "SELECT {1} FROM {0}{2};"
         if suffix and suffix[0] != " ":
             suffix = f" {suffix}"
         rows = self._r_query(qSelect.format(db_obj_type.get_table(), fields, suffix))
         return [self.obj_f.mk_dbo(db_obj_type, x) for x in rows]
 
-    # Insert
     def _insert(self, db_obj: dc.dbObj):
+        """SQL Insert"""
         qInsert = self.mk_q_insert(db_obj.get_table(), db_obj.get_row_data())
         return self._r_val_statement(*qInsert)
 
     # Bulk Insert
     def _binsert(self, db_objs: list[dc.dbObj]):
+        """SQL Bulk Insert"""
         values = []
         for db_obj in db_objs:
             qinsert = self.mk_q_insert(db_obj.get_table(), db_obj.get_row_data())
@@ -169,6 +192,7 @@ class fcdb():
 
     # Update
     def _update(self, db_obj: dc.dbObj):
+        """SQL Update"""
         if not db_obj.id or db_obj.id == -1:
             print("When updating a db obj id must be set!")
         else:
@@ -177,6 +201,7 @@ class fcdb():
 
     # Bulk Update
     def _bupdate(self, db_objs: list[dc.dbObj]):
+        """SQL Bulk Update"""
         values = []
         for db_obj in db_objs:
             if not db_obj.id or db_obj.id == -1:
@@ -188,10 +213,12 @@ class fcdb():
 
     # Upsert
     def _upsert(self, db_obj: dc.dbObj):
+        """SQL Upsert"""
         return self.RunValueStatement(*self.mk_q_upsert(db_obj.get_table(), db_obj.get_row_data()))
 
     # Bulk Upsert
     def _bupsert(self, db_objs: list[dc.dbObj]):
+        """SQL Bulk Upsert"""
         values = []
         for db_obj in db_objs:
             qupsert = self.mk_q_upsert(db_obj.get_table(), db_obj.get_row_data(), db_obj.get_id_cols())
@@ -201,16 +228,17 @@ class fcdb():
 
     # region Create
     def _prepare_staments(self, fname):
+        # Prepare DB script using delemiter from About.json
         f = open(fname)
         return "".join(f.readlines()).split(self.cmd_delim)
 
-    def r_db_script(self, fname):
+    def _r_db_script(self, fname):
+        # Run DB Script
         create = self._prepare_staments(fname)
         self.r_cmds(create)
 
     def _create_new_db(self):
-        # Create New DB
-        self.r_db_script(f"{self.data_folder}dbCreationScript.sql")
+        self._r_db_script(f"{self.data_folder}dbCreationScript.sql")
 
     def _load_startup_data(self):
         f = open(f"{self.data_folder}FC_Startup_Data.json")
@@ -266,6 +294,10 @@ class fcdb():
 
 
 class struct(dict):
+    """
+    Struct is a dictionary you can add parameters to and access like and object.
+    Used for compatibility, to mock complex objects when default values are required, etc.
+    """
     def __getattr__(self, key):
         return self[key]
 
