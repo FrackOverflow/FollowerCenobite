@@ -175,13 +175,13 @@ class dbAccessor(fcdb):
                 # Only update if newer is found.
                 if f_lFlwr < follow or f_lFlwg < follow:
                     commit_last_follows.append(ex_lf)
-   
+
             # If no existing last follow the user is new
             if len(existing_lf) == 0:
                 commit_last_follows.append(self.obj_f.last_follow(user, acc_id, lFlwgId, lFlwrId))
             if len(existing_lf) > 1:
                 print(f"Constraint Violation: Multiple Last Follows were found for user/account pair {user}, {acc_id}")
-  
+
         self._binsert(commit_follows)
         self._bupsert(commit_last_follows)  # We could make this quicker by determining which records are inserts vs updates and doing 2 bulk calls. 
     # endregion
