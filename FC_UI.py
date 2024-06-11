@@ -6,6 +6,10 @@ from FC_DBAccess import dbAccessor
 
 
 class fc_app(customtkinter.CTk):
+    """
+    FC View class.
+    Contains all UI logic for FC
+    """
     def __init__(self, dba: dbAccessor):
         super().__init__()
         self.dba = dba
@@ -140,8 +144,18 @@ class fc_app(customtkinter.CTk):
         customtkinter.set_appearance_mode(new_appearance_mode)
 
 
-# Setup active account from prefs, or prompt the user if none exists
 def setup(dba: dbAccessor):
+    """
+    Get the active user account by getting one if it already exists,
+    or by prompting the user to create a new account
+    Args:
+        dba (dbAccessor): the active database connection
+
+    Returns:
+        bool: value indicating if an active account could be created/loaded
+
+    """
+
     active_acc = None
     prefs = dba.get_active_prefs()
 
@@ -180,6 +194,13 @@ def setup(dba: dbAccessor):
 
 
 def warning(body, title):
+    """
+    Creates a simple warning dialog
+
+    Args:
+        body (str): Dialog Body
+        title (str): Dialog title
+    """
     window = customtkinter.CTk()
     window.title = title
     window.geometry("240x120")

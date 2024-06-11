@@ -7,6 +7,11 @@ from FC_DBConnect import fcdb, struct
 
 
 class dbAccessor(fcdb):
+    """
+    FC Controller Class
+    Contains abstracted methods for updating model
+    """
+
     def __init__(self, about="FC_About.json"):
         super(dbAccessor, self).__init__(about)
         self.menus = {}
@@ -183,16 +188,16 @@ class dbAccessor(fcdb):
                 print(f"Constraint Violation: Multiple Last Follows were found for user/account pair {user}, {acc_id}")
 
         self._binsert(commit_follows)
-        self._bupsert(commit_last_follows)  # We could make this quicker by determining which records are inserts vs updates and doing 2 bulk calls. 
+        self._bupsert(commit_last_follows)  # We could make this quicker by determining which records are inserts vs updates and doing 2 bulk calls.
     # endregion
 
 
 if __name__ == "__main__":
-    dbname = "ProgramData\TestData\TEST_FC.db"
+    dbname = r"ProgramData\TestData\TEST_FC.db"
     try:
-        db = dbAccessor("ProgramData/TestData/TEST_FC_About.json")
-        db.munch_follow_data("ProgramData\FollowerJson\OF_Flwg_May30_2024.json", "ProgramData\FollowerJson\OF_Flwr_May30_2024.json", 1, datetime.today().strftime("%b%d_%Y"))
-        db.munch_follow_data("ProgramData\FollowerJson\OF_Flwg_May31_2024.json", "ProgramData\FollowerJson\OF_Flwr_May31_2024.json", 1, datetime.today().strftime("%b%d_%Y"))
+        db = dbAccessor(r"ProgramData/TestData/TEST_FC_About.json")
+        db.munch_follow_data(r"ProgramData\FollowerJson\OF_Flwg_May30_2024.json", r"ProgramData\FollowerJson\OF_Flwr_May30_2024.json", 1, datetime.today().strftime("%b%d_%Y"))
+        db.munch_follow_data(r"ProgramData\FollowerJson\OF_Flwg_May31_2024.json", r"ProgramData\FollowerJson\OF_Flwr_May31_2024.json", 1, datetime.today().strftime("%b%d_%Y"))
     finally:
         if isfile(dbname):
             remove(dbname)
