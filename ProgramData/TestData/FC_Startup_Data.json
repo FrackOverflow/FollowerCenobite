@@ -13,5 +13,14 @@
             "Jan01_1999"
         
         ]
+    ],
+    "startup_prefs":[
+        [
+            -1,
+            0, 
+            "ProgramData/Progress_Files/", 
+            "ProgramData/FollowerJson/", 
+            "http://www.instagram.com/"
+        ]
     ]
 }
