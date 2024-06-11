@@ -9,7 +9,7 @@ class fcdb():
     date_format: str
     cmd_delim: str
     db_name: str
-    obj_f: dc.dbObj_factory
+    obj_f: dc.dbObjFactory
 
     def __init__(self, about="FC_About.json"):
         # Load About.json (DB constants)
@@ -31,11 +31,11 @@ class fcdb():
             print(f"No FCDB was found, initializing a new database at: \n\t---> {join(getcwd(), self.db_name)}")
             self._create_new_db()
             startup_data = self._load_startup_data()
-            self.obj_f = dc.dbObj_factory(dc.preference(*startup_data["startup_prefs"][0]), self.date_format)
+            self.obj_f = dc.dbObjFactory(dc.preference(*startup_data["startup_prefs"][0]), self.date_format)
             self._populate_startup_data(startup_data)
         else:
             self.active_prefs = self._sselect(dc.preference, suffix="ORDER BY id DESC")[0]
-            self.obj_f = dc.dbObj_factory(self.active_prefs, self.date_format)
+            self.obj_f = dc.dbObjFactory(self.active_prefs, self.date_format)
 
     # region Helpers
     # Gets the first value from a list or if its empty returns None
@@ -138,7 +138,7 @@ class fcdb():
     # endregion
 
     # region Query Methods
-    # Startup select, manually types returned records with no factory (dbObj_factory is not available until prefs are loaded)
+    # Startup select, manually types returned records with no factory (dbObjFactory is not available until prefs are loaded)
     def _sselect(self, db_obj_type: type[dc.dbObj], fields="*", suffix=""):
         qSelect = "SELECT {1} FROM {0}{2};"
         if suffix and suffix[0] != " ":
