@@ -27,46 +27,28 @@ class dbObj():
     # Fields that have to be converted to/from json
     json_fields = []
 
-    """
-    Gets the name of the ID column(s) for a dbObj
-    """
     @classmethod
     def get_id_cols(cls):
+        """ Gets the name of the ID column(s) for a dbObj."""
         return list(cls.ID_COLS)
 
-    """
-    Gets the fields to filter out when saving to the database
-    """
     @classmethod
     def _get_filter_fields(cls):
+        """ Gets the fields to filter out when saving to the database."""
         return list(cls.filter_fields)
 
-    """
-    Gets the fields to convert to/from json
-    Args:
-        cls (Type[dbObj])): A db obj type.
-
-    Returns:
-        list[str]: the name of the DB table related to cls.
-    """
     @classmethod
     def get_json_fields(cls):
+        """ Gets the fields to convert to/from json."""
         return list(cls.json_fields)
 
-    """
-    Gets the DB table name.
-    Args:
-        cls (Type[dbObj])): A db obj type.
-
-    Returns:
-        str: the name of the DB table related to cls.
-    """
     @classmethod
     def get_table(cls):
+        """Gets the DB table name."""
         return str(cls.TABLE)
 
-    # Get filtered fields prepped for database
     def _get_filtered_fields(self, filt) -> dict:
+        # Get filtered fields prepped for database
         obj_type = type(self)
         fields = dict(vars(self))
 
@@ -80,17 +62,17 @@ class dbObj():
             fields.pop(field, None)
         return fields
 
-    """
-    Gets the row data for saving to the database.
-    Includes ID if [ID is present and ID != -1]).
-
-    Args:
-        self: A dbObj instance
-
-    Returns:
-        dict: a set of (field name [key], field value) pairs
-    """
     def get_row_data(self) -> dict:
+        """
+        Gets the row data for saving to the database.
+        Includes ID if [ID is present and ID != -1]).
+
+        Args:
+            self: A dbObj instance
+
+        Returns:
+            dict: a set of (field name [key], field value) pairs
+        """
         obj_type = type(self)
         has_id = True
         id_cols = obj_type.get_id_cols()
@@ -112,17 +94,17 @@ class dbObj():
             return self._get_filtered_fields(obj_type._get_filter_fields()
                                              + id_cols)
 
-    """
-    Gets the row data for saving to the database.
-    Filters ID even when it is present.
-
-    Args:
-        self: A dbObj instance
-
-    Returns:
-        dict: a set of (field name [key], field value) pairs
-    """
     def get_display_data(self):
+        """
+        Gets the row data for saving to the database.
+        Filters ID even when it is present.
+
+        Args:
+            self: A dbObj instance
+
+        Returns:
+            dict: a set of (field name [key], field value) pairs
+        """
         obj_type = type(self)
         return self._get_filtered_fields(obj_type._get_filter_fields()
                                          + obj_type.get_id_cols())
@@ -352,32 +334,45 @@ class dbObjFactory():
         self.set_new_prefs(prefs, date_format)
 
     def set_new_prefs(self, prefs: preference, date_format: str):
+        """ Updates active Preferences and Date Format."""
         self.active_prefs = prefs
         self.db_date_format = date_format
 
     def mk_dbo(self, T: type[dbObj], fields):
+        """Creates dbObj with type & fields."""
         return getattr(self, T.__name__)(*fields)
 
+    # region Typing Methods
+    # - Names must match corresponding class
+    # - Args must match ordered column names from corresponding DB table
     def follow(self, id, username, acc_id, date, follower, following):
+        """ Create a follow from data."""
         return follow(id, username, acc_id, date, follower, following, self.db_date_format)
 
     def last_follow(self, username, acc_id, last_following_id, last_follower_id):
+        """ Create a last follow from data."""
         return last_follow(username, acc_id, last_following_id, last_follower_id)
 
     def ig_account(self, id, username, abbrv, last_update):
+        """ Create an ig_account from data."""
         return ig_account(id, username, abbrv, last_update, self.db_date_format)
 
     def preference(self, id, default_acc_id, progress_dir, data_dir, ig_url):
+        """ Create a preference from data."""
         return preference(id, default_acc_id, progress_dir, data_dir, ig_url)
 
     def fc_window(self, id, title, nickname, menu_id, subtype_id, onExit, onClose, onCapture, closeEvents, captureEvents):
+        """ Create a window from data."""
         return fc_window(id, title, nickname, menu_id, subtype_id, onExit, onClose, onCapture, closeEvents, captureEvents)
 
     def fc_menu(self, id, name, menu_def):
+        """ Create a menu from data."""
         return fc_menu(id, name, menu_def)
 
     def fc_window_subtype(self, id, subtype_id, subtype, data):
+        """ Create a window subtype from data."""
         return fc_window_subtype(id, subtype_id, subtype, data)
+    # endregion
 
 
 if __name__ == "__main__":
