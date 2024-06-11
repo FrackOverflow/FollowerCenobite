@@ -41,67 +41,78 @@ class dbAccessor(fcdb):
     # endregion
 
     # region Cached
-    # Gets currently active preferences
     def get_active_prefs(self) -> dc.preference:
+        """ Get currently active preferences."""
         if not hasattr(self, "active_prefs"):
             self.active_prefs = self.first_or(None, self._select(dc.preference, suffix="ORDER BY id DESC"))
         return self.active_prefs
 
-    # Updates prefs in DB and sets active prefs on DB connection and DB Obj factory
     def save_active_prefs(self, prefs):
+        """Updates prefs in DB and sets active prefs on DB connection."""
         self.set_new_prefs(prefs)
         return self._update(prefs)
 
     def get_ig_accounts(self):
+        """ Get all registered IG accounts."""
         if not self.ig_accs:
             self.ig_accs = {x.id: x for x in self._get_all_obj(dc.ig_account)}
         return self.ig_accs
 
     def get_ig_account_by_id(self, id):
+        """ Get an IG account using ID."""
         if not self.ig_accs:
             self.get_ig_accounts()
         return self.ig_accs.get(id)
 
     def save_ig_account(self, acc: dc.ig_account):
+        """ Save an IG account to DB."""
         return self._insert(acc)
 
     def get_windows(self):
+        """ Get all window data."""
         if not self.windows:
             self.windows = {x.id: x for x in self._get_all_obj(dc.fc_window)}
         return self.windows
 
     def get_window_by_id(self, id):
+        """ Get a window using ID."""
         if not self.windows:
             self.get_windows()
         return self.windows.get(id)
 
     def get_window_by_bickname(self, nickname):
+        """ Get a window using nickname."""
         if not self.windows:
             self.get_windows()
         # This comprehension looks weird cause it needs to parse the id: value format cache dicts.
         return next((v for k, v in self.windows.items() if v.nickname == nickname), None)
 
     def get_win_subtypes(self):
+        """ Get all window subtypes."""
         if not self.w_subtypes:
             self.w_subtypes = {x.id: x for x in self._get_all_obj(dc.fc_window_subtype)}
         return self.w_subtypes
 
     def get_win_subtype_by_id(self, id):
+        """ Get a window subtype by ID."""
         if not self.w_subtypes:
             self.get_win_subtypes()
         return self.w_subtypes.get(id)
 
     def get_menus(self):
+        """ Get all menus."""
         if not self.menus:
             self.menus = {x.id: x for x in self._get_all_obj(dc.fc_menu)}
         return self.menus
 
     def get_menuById(self, id):
+        """ Get a menu subtype by ID."""
         if not self.menus:
             self.get_menus()
         return self.menus.get(id)
 
     def get_active_ig_account(self):
+        """ Get the active IG account."""
         if not self.active_prefs:
             self.get_active_prefs()
         if not self.ig_accs:
@@ -111,12 +122,15 @@ class dbAccessor(fcdb):
 
     # region Not Cached
     def get_follows_by_acc(self, acc):
+        """ Get all follows by Account."""
         return self._select(dc.follow, suffix=f"WHERE acc_id = {acc.id}")
 
     def get_last_follows_by_acc(self, acc: dc.ig_account) -> list[dc.last_follow]:
+        """ Get all last_follows by Account."""
         return self._select(dc.last_follow, suffix=f"WHERE acc_id = {acc.id}")
 
     def get_flws_by_last_flw(self, lf: dc.last_follow):
+        """ Get follows referenced on a last_follow."""
         flws = []
         if lf.last_follower_id:
             flws.append(self._select(dc.follow, suffix=f"WHERE id = {lf.last_follower_id}"))
@@ -126,6 +140,7 @@ class dbAccessor(fcdb):
         return flws
 
     def get_newest_follows_by_acc(self, acc) -> list[dc.follow]:
+        """ Get all the newest follows for each user following an account."""
         lfs = self.get_last_follows_by_acc(acc)
         recent_flws = []
         for lf in lfs:
@@ -139,6 +154,7 @@ class dbAccessor(fcdb):
 
     # region JsonProcessing
     def munch_follow_data(self, follower_json, following_json, acc_id, date):
+        """ Process json follower data into database."""
         # Load Json Data
         f_flwr = open(follower_json, encoding="utf-8-sig")
         f_flwg = open(following_json, encoding="utf-8-sig")
@@ -193,7 +209,15 @@ class dbAccessor(fcdb):
                 print(f"Constraint Violation: Multiple Last Follows were found for user/account pair {user}, {acc_id}")
 
         self._binsert(commit_follows)
-        self._bupsert(commit_last_follows)  # We could make this quicker by determining which records are inserts vs updates and doing 2 bulk calls.
+        self._bupsert(commit_last_follows)  
+        # We could make this quicker by determining which records are inserts vs updates and doing 2 bulk calls.
+        
+        # We currently don't mark users as "unfollowed" if there is no record in follower/following, but this could happen if we both unfollow eachother
+        # To track this we need to track when the last import for a user was, get it when we start the import, and look for any "follow" records with
+        # the previous import date that don't show up in follower or following. IS THERE ANY BENEFIT TO TRACKING THIS??
+
+        # When we import we should create a new GUID and save it in an "imports" table which will track when a follow record was imported
+        # To roll back, we can show a list of imports and let the user select an import to rollback to. We should then delete the 
     # endregion
 
 
