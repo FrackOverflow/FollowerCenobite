@@ -170,79 +170,6 @@ class preference(dbObj):
         self.progress_dir = progress_dir
         self.data_dir = data_dir
         self.ig_url = ig_url
-
-
-class fc_window(dbObj):
-    TABLE = "fc_window"
-    json_fields = dbObj.json_fields + ["closeEvents", "captureEvents"]
-
-    def __init__(self,
-                 id,
-                 title,
-                 nickname,
-                 menu_id,
-                 subtype_id,
-                 onExit,
-                 onClose,
-                 onCapture,
-                 closeEvents,
-                 captureEvents):
-        super(fc_window, self).__init__()
-        self.id = id
-        self.title = title
-        self.nickname = nickname
-        self.menu_id = menu_id
-        self.subtype_id = subtype_id
-        self.onExit = onExit
-        self.onClose = onClose
-        self.onCapture = onCapture
-        if isinstance(closeEvents, str):
-            self.closeEvents = json.loads(closeEvents)
-        else:
-            self.closeEvents = closeEvents
-
-        if isinstance(captureEvents, str):
-            self.captureEvents = json.loads(captureEvents)
-        else:
-            self.captureEvents = captureEvents
-
-
-class fc_menu(dbObj):
-    TABLE = "fc_menu"
-    json_fields = dbObj.json_fields + ["menu_def"]
-
-    def __init__(self,
-                 id,
-                 name,
-                 menu_def):
-        super(fc_menu, self).__init__()
-        self.id = id
-        self.name = name
-        if isinstance(menu_def, str):
-            self.menu_def = json.loads(menu_def)
-        else:
-            self.menu_def = menu_def
-
-    def raw_menu_def(self):
-        return json.dumps(self.menu_def, [])
-
-
-class fc_window_subtype(dbObj):
-    TABLE = "window_subtype"
-    json_fields = dbObj.json_fields + ["data"]
-
-    def __init__(self, id, subtype_id, subtype, data):
-        super(fc_window_subtype, self).__init__()
-        self.id = id
-        self.subtype_id = subtype_id
-        self.subtype = subtype
-        if isinstance(data, str):
-            self.data = json.loads(data)
-        else:
-            self.data = data
-
-    def raw_data(self):
-        return json.dumps(self.data)
 # endregion
 
 
@@ -360,18 +287,6 @@ class dbObjFactory():
     def preference(self, id, default_acc_id, progress_dir, data_dir, ig_url):
         """ Create a preference from data."""
         return preference(id, default_acc_id, progress_dir, data_dir, ig_url)
-
-    def fc_window(self, id, title, nickname, menu_id, subtype_id, onExit, onClose, onCapture, closeEvents, captureEvents):
-        """ Create a window from data."""
-        return fc_window(id, title, nickname, menu_id, subtype_id, onExit, onClose, onCapture, closeEvents, captureEvents)
-
-    def fc_menu(self, id, name, menu_def):
-        """ Create a menu from data."""
-        return fc_menu(id, name, menu_def)
-
-    def fc_window_subtype(self, id, subtype_id, subtype, data):
-        """ Create a window subtype from data."""
-        return fc_window_subtype(id, subtype_id, subtype, data)
     # endregion
 
 
@@ -380,11 +295,8 @@ if __name__ == "__main__":
     lf = last_follow("Babar", 56, 21, 21)
     iga = ig_account(56, "Barbossa", "BRBSA", d8)
     f = follow(21, "Babar", 56, datetime.today().strftime("%b%D_%Y"), 1, 1, d8, "%b%D_%Y")
-    wsub = fc_window_subtype(5, 2, "Barbarossa", '{"foo":"baz"}')
-    m = fc_menu(1, "Advanced", [])
-    w = fc_window(6, "Main", "Main", 1, 5, "", "", "", [], [])
 
-    testArray = [lf, iga, f, wsub, m, w]
+    testArray = [lf, iga, f]
 
     for db_o in testArray:
         t_obj = type(db_o)
