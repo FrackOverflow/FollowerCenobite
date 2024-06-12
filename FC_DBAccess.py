@@ -35,7 +35,7 @@ class dbAccessor(fcdb):
         return self.first_or(None, self._select(T, suffix=f"ORDER BY ({', '.join(T.get_id_cols())}) DESC LIMIT 1"))
 
     def _get_last_id(self, T: type[dc.dbObj]):
-        firstId = struct()
+        firstId = Struct()
         firstId.id = 0
         return self.first_or(firstId, self._select(T, suffix=f"ORDER BY ({', '.join(T.get_id_cols())}) DESC LIMIT 1")).id
     # endregion
