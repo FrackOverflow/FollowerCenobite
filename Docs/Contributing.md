@@ -18,5 +18,6 @@ How to get started writing code for FC:
 4. Use pip to install the following packages to the virtual environment:
     - [CustomTkinter](https://pypi.org/project/customtkinter/) ([Docs](https://customtkinter.tomschimansky.com/documentation/))
     - [Pillow](https://pypi.org/project/pillow/)
+    - [Flake8](https://pypi.org/project/flake8/) (Flake8 IDE extensions also work, config is in setup.cfg)
 5. Create your own repo in a Fork of FC.
 6. Work in your fork, when features are complete create Pull Requests back to the main repo.
