@@ -10,20 +10,19 @@ FC focuses on publicly available information, you don't need to own the instagra
 
 ## Roadmap
 
-1. Setup Virtual Environment, document in Contributing (include python interpreter version!)
-2. Json Import UI
-3. Write DB Class Tests
-4. Implement Follow/Unfollow Crawler
-5. Crawler UI
-6. Exclusion lists!
-7. Follow/Unfollow Crawler Tests (Including tests for Json consumption)
-8. User Detail Page
-9. Import Rollback
-10. Rollback tests
-11. Cannabalize User's Followers
-12. Integrate JSON collection
-13. Warning window is cluttered
-14. Setup window should either be a single window w 2 inputs, or just username entry and set abbreviation later.
+1. Json Import UI
+2. Write DB Class Tests
+3. Implement Follow/Unfollow Crawler
+4. Crawler UI
+5. Exclusion lists!
+6. Follow/Unfollow Crawler Tests (Including tests for Json consumption)
+7. User Detail Page
+8. Import Rollback
+9. Rollback tests
+10. Cannabalize User's Followers
+11. Integrate JSON collection
+12. Warning window is cluttered
+13. Setup window should either be a single window w 2 inputs, or just username entry and set abbreviation later.
 
 ## Completed
 1. DB Design
@@ -39,6 +38,7 @@ FC focuses on publicly available information, you don't need to own the instagra
 7. Removed PySimpleGUI data/classes from model
 8. Main UI window/navigation
 9. Designed logo and replaced stock images
+10. Finished contribution startup guide
 
 # Attribution
 FC Logo by FrackOverflow  
