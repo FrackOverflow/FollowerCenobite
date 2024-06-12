@@ -6,3 +6,4 @@
 *.db
 /__pycache__
 /Graveyard
+/.venv
