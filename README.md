@@ -38,3 +38,7 @@ FC focuses on publicly available information, you don't need to own the instagra
 6. Updated all files to match style guide
 7. Removed PySimpleGUI data/classes from model
 8. Main UI window/navigation
+
+# Attribution
+FC Logo by FrackOverflow
+Icons by svgrepo.com
