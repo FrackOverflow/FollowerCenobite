@@ -11,7 +11,7 @@ class fc_app(ctk.CTk):
     Contains all UI logic for FC
     """
 
-    def __init__(self, 
+    def __init__(self,
                  dba: dbAccessor,
                  theme_path: str = ""):
         super().__init__()
@@ -115,10 +115,53 @@ class fc_app(ctk.CTk):
         return None
 
     def _mk_f_import(self):
-        # Make the frame for the import tab
-        frame = ctk.CTkFrame(self, corner_radius=0, fg_color="transparent")
-        ctk.CTkLabel(frame, text="IMPORT").pack()
-        return frame
+        # Frame w/ 1x2 grid
+        f_import = ctk.CTkFrame(self, corner_radius=0, fg_color="transparent")
+        f_import.grid_rowconfigure(0, weight=1)
+        f_import.grid_columnconfigure(1, weight=1)
+
+        # Import detail options
+        f_detail = ctk.CTkFrame(f_import, corner_radius=0)
+        f_detail.grid(row=0, column=0, sticky="nw")
+
+        # Create tabview and tab layouts
+        self.import_tabview = ctk.CTkTabview(f_detail)
+        self.import_tabview.pack()
+        self.import_mantab = self.import_tabview.add("Manual")
+        self.import_autotab = self.import_tabview.add("Auto")
+        self.import_mantab.grid_columnconfigure(0, weight=1)
+        self.import_mantab.grid_rowconfigure(1, weight=1)
+        self.import_autotab.grid_columnconfigure(1, weight=1)
+        self.import_autotab.grid_rowconfigure(2, weight=1)
+
+        testfsbtn = self._fs_button(master=self.import_mantab,
+                                    text="Settings",
+                                    fg_color="transparent",
+                                    text_color=("gray10", "gray90"),
+                                    hover_color=("gray70", "gray30"))
+        testfsbtn.grid(row=0, column=0, sticky="nw")
+
+
+        # Manual Tab
+        # 2 File selects
+
+        # Auto Tab
+        # Flwr/Flwg prefix
+        # Detect Button
+
+
+        # Import general options
+        f_general = ctk.CTkFrame(f_import, corner_radius=0)
+        f_general.grid(row=0, column=1, sticky="ne")
+        # Column for global frame values
+        # Date format
+        # Data Folder
+
+        #ctk.CTkLabel(f_general, text="GENERALIMPORT").pack()
+        #ctk.CTkEntry(f_general).pack()
+        #ctk.CTkLabel(f_detail, text="DETAILIMPORT").pack()
+        #ctk.CTkEntry(f_detail).pack()
+        return f_import
 
     def _mk_f_settings(self):
         # Make the frame for the settings tab
@@ -159,6 +202,28 @@ class fc_app(ctk.CTk):
 
     def _chg_ddl_theme(self, new_appearance_mode):
         ctk.set_appearance_mode(new_appearance_mode)
+
+    def _file_select(self):
+        # Open file dialog and return selected file name
+        return ctk.filedialog.askopenfilename()
+
+    def _dir_select(self):
+        # Open file dialog and return selected folder name
+        return ctk.filedialog.askdirectory()
+
+    def _fs_button(self, dir_only=False, **kwargs):
+        cmd = self._dir_select if dir_only else self._file_select
+        return ctk.CTkButton(**kwargs, command=cmd)
+    
+    def _mk_fs_entry(self, master, dir_only=False, **kwargs):
+        #ICON?
+        #TEXT
+        #ENTRY
+        #BUTTON
+        #Add to frame!
+        f_fs = ctk.CTkFrame()
+
+        return f_fs
 
 
 def setup(dba: dbAccessor):
