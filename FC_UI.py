@@ -3,6 +3,7 @@ import os
 from PIL import Image
 from datetime import datetime
 from FC_DBAccess import dbAccessor
+import FC_UIBuilder as ui_b
 
 
 class fc_app(ctk.CTk):
@@ -73,7 +74,7 @@ class fc_app(ctk.CTk):
 
         # Make Frames
         self.crawler_frame = self._mk_f_crawler()
-        self.import_frame = self._mk_f_import()
+        self.import_frame = ui_b.f_import(self)
         self.settings_frame = self._mk_f_settings()
         self._get_f_by_name("crawler")
 
@@ -113,55 +114,6 @@ class fc_app(ctk.CTk):
         # Make a table for displaying data
         # for i in range(len(headings))
         return None
-
-    def _mk_f_import(self):
-        # Frame w/ 1x2 grid
-        f_import = ctk.CTkFrame(self, corner_radius=0, fg_color="transparent")
-        f_import.grid_rowconfigure(0, weight=1)
-        f_import.grid_columnconfigure(1, weight=1)
-
-        # Import detail options
-        f_detail = ctk.CTkFrame(f_import, corner_radius=0)
-        f_detail.grid(row=0, column=0, sticky="nw")
-
-        # Create tabview and tab layouts
-        self.import_tabview = ctk.CTkTabview(f_detail)
-        self.import_tabview.pack()
-        self.import_mantab = self.import_tabview.add("Manual")
-        self.import_autotab = self.import_tabview.add("Auto")
-        self.import_mantab.grid_columnconfigure(0, weight=1)
-        self.import_mantab.grid_rowconfigure(1, weight=1)
-        self.import_autotab.grid_columnconfigure(1, weight=1)
-        self.import_autotab.grid_rowconfigure(2, weight=1)
-
-        testfsbtn = self._fs_button(master=self.import_mantab,
-                                    text="Settings",
-                                    fg_color="transparent",
-                                    text_color=("gray10", "gray90"),
-                                    hover_color=("gray70", "gray30"))
-        testfsbtn.grid(row=0, column=0, sticky="nw")
-
-
-        # Manual Tab
-        # 2 File selects
-
-        # Auto Tab
-        # Flwr/Flwg prefix
-        # Detect Button
-
-
-        # Import general options
-        f_general = ctk.CTkFrame(f_import, corner_radius=0)
-        f_general.grid(row=0, column=1, sticky="ne")
-        # Column for global frame values
-        # Date format
-        # Data Folder
-
-        #ctk.CTkLabel(f_general, text="GENERALIMPORT").pack()
-        #ctk.CTkEntry(f_general).pack()
-        #ctk.CTkLabel(f_detail, text="DETAILIMPORT").pack()
-        #ctk.CTkEntry(f_detail).pack()
-        return f_import
 
     def _mk_f_settings(self):
         # Make the frame for the settings tab
@@ -203,28 +155,6 @@ class fc_app(ctk.CTk):
     def _chg_ddl_theme(self, new_appearance_mode):
         ctk.set_appearance_mode(new_appearance_mode)
 
-    def _file_select(self):
-        # Open file dialog and return selected file name
-        return ctk.filedialog.askopenfilename()
-
-    def _dir_select(self):
-        # Open file dialog and return selected folder name
-        return ctk.filedialog.askdirectory()
-
-    def _fs_button(self, dir_only=False, **kwargs):
-        cmd = self._dir_select if dir_only else self._file_select
-        return ctk.CTkButton(**kwargs, command=cmd)
-    
-    def _mk_fs_entry(self, master, dir_only=False, **kwargs):
-        #ICON?
-        #TEXT
-        #ENTRY
-        #BUTTON
-        #Add to frame!
-        f_fs = ctk.CTkFrame()
-
-        return f_fs
-
 
 def setup(dba: dbAccessor):
     """
@@ -249,11 +179,11 @@ def setup(dba: dbAccessor):
     if prefs.default_acc_id == 0 or not active_acc:
 
         # Get ig account info with popup dialogs
-        usrname = customtkinter.CTkInputDialog(text="Enter your Instagram Username:", title="FC User Setup")
+        usrname = ctk.CTkInputDialog(text="Enter your Instagram Username:", title="FC User Setup")
         usrname = usrname.get_input()
         if not usrname:
             return False
-        usr_abbrv = customtkinter.CTkInputDialog(text="Enter an abbreviation for your username:", title="FC User Setup")
+        usr_abbrv = ctk.CTkInputDialog(text="Enter an abbreviation for your username:", title="FC User Setup")
         usr_abbrv = usr_abbrv.get_input()
         if not usr_abbrv:
             return False
