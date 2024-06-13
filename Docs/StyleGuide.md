@@ -36,10 +36,16 @@ Unless the implementation is particularly complex, the following **do not need a
 - Dunder methods
 
 ### Type Hints
-Type hints are always preferred, they make coding quicker at very little cost. The C# dev in me loves them, however, they can get in the way, use your best judgement here.
+Type hints are preferred *where they make things more clear.* Especially for complex functionality where the type is unlikely to change.
 
-## Specifics
-### Classes
+However, type hints can get in the way of clean code: 
+- Functions may be rewritten to return different types
+- Functions may return different types by design (an issue that deserves its own section...) 
+- Sometimes Python has already determined a return/arg type
+
+You know you need to add a type hint when you get frustrated through repeated failures to access members w/ hints! Don't hestitate to remove unhelpful type hints, they should serve the developer.
+
+### Constructors
 **Constructors** should stack each argument on a seperate line:
 ```
 def __init__(self,

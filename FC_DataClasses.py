@@ -121,7 +121,8 @@ class DateComparable(dbObj):
     # Date property name
     date_prop = "date"
 
-    def __init__(self, date_format):
+    def __init__(self,
+                 date_format):
         super(DateComparable, self).__init__()
         self.date_format = date_format
 

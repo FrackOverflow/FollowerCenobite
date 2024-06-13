@@ -20,7 +20,8 @@ class fcdb():
     db_name: str
     obj_f: dc.dbObjFactory
 
-    def __init__(self, about="FC_About.json"):
+    def __init__(self,
+                 about="FC_About.json"):
         # Load About.json (DB constants)
         about = json.load(open(about))
         self.date_format = about["DateFormat"]

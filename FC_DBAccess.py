@@ -17,7 +17,8 @@ class dbAccessor(fcdb):
     Contains high-level methods for updating model with dbObj classes
     """
 
-    def __init__(self, about="FC_About.json"):
+    def __init__(self,
+                 about="FC_About.json"):
         super(dbAccessor, self).__init__(about)
         self.menus = {}
         self.windows = {}
