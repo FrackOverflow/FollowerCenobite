@@ -9,7 +9,7 @@ Growing an instagram following requires managing a lot of relationships. After u
 FC focuses on publicly available information, you don't need to own the instagram account you are analyzing. However if you do decide to collect information for FC, its recommended that you don't do it from the account you are analyzing, or any other account linked to it. I have never run into trouble but even better if you can't be traced at all :)
 
 ## Roadmap
-
+0. Add License
 1. Json Import UI
 2. Write DB Class Tests
 3. Implement Follow/Unfollow Crawler
