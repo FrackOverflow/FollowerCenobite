@@ -74,21 +74,20 @@ class fc_app(ctk.CTk):
 
     def _ld_images(self):
         # Load Images (Consider Light & Dark Mode!)
-        image_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), f"{self.dba.data_folder}/images/")
-        self.logo_image = ctk.CTkImage(Image.open(os.path.join(image_path, "fc_logo.png")), size=(39, 39))
+        self.logo_image = ctk.CTkImage(Image.open(os.path.join(self.dba.image_path, "fc_logo.png")), size=(39, 39))
 
-        self.crawler_image = ctk.CTkImage(dark_image=Image.open(os.path.join(image_path, "crawler_dark.png")),
-                                          light_image=Image.open(os.path.join(image_path, "crawler_light.png")), size=(30, 30))
-        self.import_image = ctk.CTkImage(dark_image=Image.open(os.path.join(image_path, "import_dark.png")),
-                                         light_image=Image.open(os.path.join(image_path, "import_light.png")), size=(30, 30))
-        self.settings_image = ctk.CTkImage(dark_image=Image.open(os.path.join(image_path, "settings_dark.png")),
-                                           light_image=Image.open(os.path.join(image_path, "settings_light.png")), size=(30, 30))
-        
+        self.crawler_image = ctk.CTkImage(dark_image=Image.open(os.path.join(self.dba.image_path, "crawler_dark.png")),
+                                          light_image=Image.open(os.path.join(self.dba.image_path, "crawler_light.png")), size=(30, 30))
+        self.import_image = ctk.CTkImage(dark_image=Image.open(os.path.join(self.dba.image_path, "import_dark.png")),
+                                         light_image=Image.open(os.path.join(self.dba.image_path, "import_light.png")), size=(30, 30))
+        self.settings_image = ctk.CTkImage(dark_image=Image.open(os.path.join(self.dba.image_path, "settings_dark.png")),
+                                           light_image=Image.open(os.path.join(self.dba.image_path, "settings_light.png")), size=(30, 30))
+
     def _ld_fonts(self):
         FONTFAM = "OCR A Extended"
         self._nav_font = ctk.CTkFont(family=FONTFAM, size=16)
         self._title_font = ctk.CTkFont(family=FONTFAM, size=18)
-        
+
     def _mk_f_crawler(self):
         # Make the CTk frame for the crawler tab
         frame = ctk.CTkScrollableFrame(self, corner_radius=0, fg_color="transparent")
