@@ -1,14 +1,16 @@
 # FC Style Guide
 Unless specifically stated, FC follows the standard set out in [PEP 8](https://peps.python.org/pep-0008/#introduction).
 
+FC follows the Model-View-Controller pattern.
+
 ## Linting
-FC using flake8 for linting. The flake8 configuration in setupconfig has the following rules:
+FC uses flake8 for linting. The flake8 configuration in setupconfig has the following rules:
 Ignore E501 - Lines must be <79 characters long
 
 ## General
 ### Naming
 Methods & Functions:
-- All methods and functions are in lowercase with name that describe their implementation
+- All methods and functions are in lowercase with a name that describes their implementation
 - Public API methods should have a name that describes their end result (instead of implementation)
 - Private methods start with an underscore
 - Public methods do not start with an underscore
@@ -19,7 +21,7 @@ Classes:
 
 Files:
 - All File & Folder names are Capitalized with spaces removed
-- All python & static json files are prefixed with FC_****.py
+- All included python & json files are prefixed with FC_****.py
 
 ### Comments
 The following items should **always have a docstring**:
