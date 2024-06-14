@@ -4,7 +4,7 @@ FC_DBConnect
 Low level DB access and setup logic
 """
 from os import remove, getcwd
-from os.path import isfile, join
+import os.path
 import json
 import sqlite3
 import FC_DataClasses as dc
@@ -26,8 +26,9 @@ class fcdb():
         about = json.load(open(about))
         self.date_format = about["DateFormat"]
         self.cmd_delim = about["DBCmdDelim"]
-        self.data_folder = about["DataFolder"]
-        self.db_name = about["DataFolder"] + about["DBName"]
+        self.data_folder = fcdb._fq_path(about["DataFolder"])
+        self.db_name = fcdb._fq_path(self.data_folder, about["DBName"])
+        self.image_path = fcdb._fq_path(self.data_folder, "images")
         self._set_db_and_prefs()
 
     def set_new_prefs(self, prefs, date_fmt=""):
@@ -39,8 +40,8 @@ class fcdb():
 
     def _set_db_and_prefs(self):
         # sets DB connection and preferences, creates DB if it isn't found
-        if not isfile(self.db_name):
-            print(f"No FCDB was found, initializing a new database at: \n\t---> {join(getcwd(), self.db_name)}")
+        if not os.path.isfile(self.db_name):
+            print(f"No FCDB was found, initializing a new database at: \n\t---> {os.path.join(getcwd(), self.db_name)}")
             self._create_new_db()
             startup_data = self._load_startup_data()
             self.obj_f = dc.dbObjFactory(dc.preference(*startup_data["startup_prefs"][0]), self.date_format)
@@ -50,6 +51,11 @@ class fcdb():
             self.obj_f = dc.dbObjFactory(self.active_prefs, self.date_format)
 
     # region Helpers
+    @staticmethod
+    def _fq_path(*paths):
+        # Returns a path relative to the FC install folder
+        return os.path.join(os.path.dirname(os.path.realpath(__file__)), *paths)
+
     @staticmethod
     def first_or(default, result):
         """ Gets the first value from a list or if its empty returns None."""
@@ -274,5 +280,5 @@ if __name__ == "__main__":
         db = fcdb("ProgramData/TestData/TEST_FC_About.json")
         # db.munch_follow_data("ProgramData\FollowerJson\OF_Flwg_May30_2024.json", "ProgramData\FollowerJson\OF_Flwr_May30_2024.json", 0, datetime.today().strftime("%b%d_%Y"))
     finally:
-        if isfile(dbname):
+        if os.path.isfile(dbname):
             remove(dbname)

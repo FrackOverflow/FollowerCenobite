@@ -3,6 +3,6 @@
     "Version":"0.1",
     "DBName":"FC.db",
     "DBCmdDelim":"%GO%",
-    "DataFolder":"ProgramData/",
+    "DataFolder":"ProgramData",
     "DateFormat":"%b%d_%Y"
 }
