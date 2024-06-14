@@ -58,3 +58,14 @@ def __init__(self,
 
 ### Line Length
 Line length is not limited for this project. That doesn't mean you shouldn't ever wrap a line, but the usual 79 characters is crazy. Use your best judgement here.
+
+### UI
+FC supports dark and light mode, take this into consideration when designing UI.
+
+#### Colors
+Logo:
+- Blue Gradient (\#0081FB to \#007ffa)
+
+GUI:
+- dark colors
+- light colors
