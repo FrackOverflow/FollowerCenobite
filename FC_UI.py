@@ -1,3 +1,9 @@
+"""
+FC_UI
+
+View interface for FC. Code should reference FC_UI, NOT FC_UIBuilder.
+Parts of FC_UIBuilder are marked to be moved to a seperate components repo.
+"""
 import customtkinter as ctk
 import os
 from PIL import Image
@@ -8,8 +14,8 @@ import FC_UIBuilder as ui_b
 
 class fc_app(ctk.CTk):
     """
-    FC View class.
-    Contains all UI logic for FC
+    FC App
+    The main view class for FC
     """
 
     def __init__(self,
@@ -21,28 +27,16 @@ class fc_app(ctk.CTk):
         self.dba = dba
         self.title("Follower Cenobite")
         self.geometry("1080x600")
-        FONTFAM = "OCR A Extended"
-
         if theme_path:
             ctk.set_default_color_theme(theme_path)
-
-        self._nav_font = ctk.CTkFont(family=FONTFAM, size=16)
-        self._title_font = ctk.CTkFont(family=FONTFAM, size=18)
 
         # 1x2 Grid Layout
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(1, weight=1)
 
-        # Images (Light & Dark Mode!)
-        image_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), f"{dba.data_folder}/images/")
-        self.logo_image = ctk.CTkImage(Image.open(os.path.join(image_path, "fc_logo.png")), size=(39, 39))
-
-        self.crawler_image = ctk.CTkImage(dark_image=Image.open(os.path.join(image_path, "crawler_dark.png")),
-                                          light_image=Image.open(os.path.join(image_path, "crawler_light.png")), size=(30, 30))
-        self.import_image = ctk.CTkImage(dark_image=Image.open(os.path.join(image_path, "import_dark.png")),
-                                         light_image=Image.open(os.path.join(image_path, "import_light.png")), size=(30, 30))
-        self.settings_image = ctk.CTkImage(dark_image=Image.open(os.path.join(image_path, "settings_dark.png")),
-                                           light_image=Image.open(os.path.join(image_path, "settings_light.png")), size=(30, 30))
+        # Load images/fonts
+        self._ld_images()
+        self._ld_fonts()
 
         # Navigation Frame
         self.navigation_frame = ctk.CTkFrame(self, corner_radius=0)
@@ -78,6 +72,23 @@ class fc_app(ctk.CTk):
         self.settings_frame = self._mk_f_settings()
         self._get_f_by_name("crawler")
 
+    def _ld_images(self):
+        # Load Images (Consider Light & Dark Mode!)
+        image_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), f"{self.dba.data_folder}/images/")
+        self.logo_image = ctk.CTkImage(Image.open(os.path.join(image_path, "fc_logo.png")), size=(39, 39))
+
+        self.crawler_image = ctk.CTkImage(dark_image=Image.open(os.path.join(image_path, "crawler_dark.png")),
+                                          light_image=Image.open(os.path.join(image_path, "crawler_light.png")), size=(30, 30))
+        self.import_image = ctk.CTkImage(dark_image=Image.open(os.path.join(image_path, "import_dark.png")),
+                                         light_image=Image.open(os.path.join(image_path, "import_light.png")), size=(30, 30))
+        self.settings_image = ctk.CTkImage(dark_image=Image.open(os.path.join(image_path, "settings_dark.png")),
+                                           light_image=Image.open(os.path.join(image_path, "settings_light.png")), size=(30, 30))
+        
+    def _ld_fonts(self):
+        FONTFAM = "OCR A Extended"
+        self._nav_font = ctk.CTkFont(family=FONTFAM, size=16)
+        self._title_font = ctk.CTkFont(family=FONTFAM, size=18)
+        
     def _mk_f_crawler(self):
         # Make the CTk frame for the crawler tab
         frame = ctk.CTkScrollableFrame(self, corner_radius=0, fg_color="transparent")
@@ -205,17 +216,38 @@ def setup(dba: dbAccessor):
         return False
 
 
-def warning(body, title):
-    """
-    Creates a simple warning dialog
+class fc_dialogue(ctk.CTk):
+    def __init__(self,
+                 title):
+        super().__init__()
+        self.title = title
 
-    Args:
-        body (str): Dialog Body
-        title (str): Dialog title
-    """
-    window = ctk.CTk()
-    window.title = title
-    window.geometry("240x120")
-    ctk.CTkLabel(window, text=body, justify=ctk.LEFT).pack()
-    ctk.CTkButton(window, text="Close", command=window.destroy).pack()
-    window.mainloop()
+
+class fc_warn(fc_dialogue):
+    DEFAULT_ICON = {"Light":"",
+                    "Dark":""}
+
+    def __init__(self,
+                 body,
+                 light_icon="",
+                 dark_icon="",
+                 *args,
+                 **kwargs):
+        super().__init__(*args, **kwargs)
+        if not light_icon:
+            light_icon = self._get_def_icon()["Light"]
+        if not dark_icon:
+            dark_icon = self._get_def_icon()["Dark"]
+        #self.icon = ctk.CTkImage(light_image=)
+        self.lbl_body = ctk.CTkLabel(self, text=body, justify=ctk.LEFT)
+        self.btn_cls = ctk.CTkButton(self, text="Close", command=self.destroy)
+        self.lbl_body.pack(pady=20)
+        self.btn_cls.pack(side=ctk.BOTTOM, pady=20)
+    
+    @classmethod
+    def _get_def_icon(cls):
+        return cls.DEFAULT_ICON.copy()
+
+if __name__ == "__main__":
+    a = fc_warn("TESTTITLE", "testbody")
+    a.mainloop()
