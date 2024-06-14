@@ -12,7 +12,8 @@ from FC_UI import fc_app, setup, fc_warn
 
 class FollowerCenobite():
     """
-    FC App Launcher, handles setup & context switching
+    FC App
+    Entry point for FollowerCenobite
     """
     def main(self):
         self.dba = dbAccessor()
