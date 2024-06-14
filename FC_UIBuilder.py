@@ -47,13 +47,19 @@ class f_import(f_main):
         self.entr_flwr_man.grid(row=1, column=0, sticky="nw")
 
         self.import_autotab.grid_columnconfigure(0, weight=1)
-        self.import_autotab.grid_rowconfigure(2, weight=1)
+        self.import_autotab.grid_rowconfigure(3, weight=1)
 
         self.entr_flwr_auto = label_entry(lbl_text="Follower Abbrv: ", placeholder_text="Follower File Abbrv", master=self.import_autotab)
         self.entr_flwr_auto.grid(row=0, column=0, sticky="nw")
 
         self.entr_flwg_auto = label_entry(lbl_text="Following Abbrv: ", placeholder_text="Following File Abbrv", master=self.import_autotab)
         self.entr_flwg_auto.grid(row=1, column=0, sticky="nw")
+
+        self.entr_date_format = label_entry(lbl_text="Date Format: ", master=self.import_autotab)
+        self.entr_date_format.grid(row=2, column=0, sticky="nw")
+
+        self.btn_detect = ctk.CTkButton(self.import_autotab, text="Detect Files")
+        self.btn_detect.grid(row=3, column=0, sticky="nw")
 
         """
         # Auto Tab
