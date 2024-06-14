@@ -202,7 +202,7 @@ def setup(dba: dbAccessor):
         startAcc = dba.obj_f.ig_account(-1, usrname, usr_abbrv, datetime.today().strftime(dba.date_format))
         startAcc.id = dba.save_ig_account(startAcc)
         if startAcc.id <= 0:
-            warning(f"There was an issue saving {usrname} to the database", "Database Error")
+            fc_warn(f"There was an issue saving {usrname} to the database", "Database Error")
         else:
             active_acc = startAcc
             prefs.default_acc_id = startAcc.id
@@ -217,36 +217,68 @@ def setup(dba: dbAccessor):
 
 class fc_dialogue(ctk.CTk):
     def __init__(self,
-                 title):
+                 title,
+                 image_dir=""):
         super().__init__()
         self.title = title
+        self.image_dir = image_dir
 
 
 class fc_warn(fc_dialogue):
-    DEFAULT_ICON = {"Light":"",
-                    "Dark":""}
+    DEFAULT_ICON = {"Light": "db_err_light2.png",
+                    "Dark": "db_err_dark.png"}
 
     def __init__(self,
-                 body,
+                 warning,
+                 body="",
                  light_icon="",
                  dark_icon="",
                  *args,
                  **kwargs):
         super().__init__(*args, **kwargs)
-        if not light_icon:
-            light_icon = self._get_def_icon()["Light"]
-        if not dark_icon:
-            dark_icon = self._get_def_icon()["Dark"]
-        #self.icon = ctk.CTkImage(light_image=)
-        self.lbl_body = ctk.CTkLabel(self, text=body, justify=ctk.LEFT)
-        self.btn_cls = ctk.CTkButton(self, text="Close", command=self.destroy)
-        self.lbl_body.pack(pady=20)
-        self.btn_cls.pack(side=ctk.BOTTOM, pady=20)
-    
+        self.f_main = ctk.CTkFrame(self)
+        self.f_main.pack(anchor=ctk.CENTER, padx=30, pady=30, fill=ctk.BOTH)
+        # Warning Frame
+        f_warn = ctk.CTkFrame(self.f_main)
+
+        # Warning Icon
+        if self.image_dir:
+            if not light_icon:
+                light_icon = self._get_def_icon()["Light"]
+            if not dark_icon:
+                dark_icon = self._get_def_icon()["Dark"]
+            self.icon = ctk.CTkImage(size=(40, 40), light_image=Image.open(os.path.join(self.image_dir, light_icon)), dark_image=Image.open(os.path.join(self.image_dir, dark_icon)))
+            ctk.CTkLabel(f_warn, text="", image=self.icon).pack(side=ctk.LEFT)
+
+        # I NEED TO PASS IN FONTS HERE, CAN I USE SOME SORT OF PREFS TO PASS FONTS, IMAGE FOLDER, ETC INSTEAD OF THRU CONSTRUCTOR???
+
+        # Warning Message
+        self.lbl_warn = ctk.CTkLabel(f_warn, text=warning, justify=ctk.LEFT)
+        self.lbl_warn.pack(side=ctk.LEFT, padx=10)
+        f_warn.pack(anchor='w', pady=20, padx=40)
+
+        # Warning Body
+        if body:
+            self.lbl_body = ctk.CTkLabel(self.f_main, text=body, justify=ctk.LEFT, wraplength=380)
+            self.lbl_body.pack(anchor='w', fill=ctk.BOTH, padx=20, pady=10)
+
+        self.btn_cls = ctk.CTkButton(self.f_main, text="Close", command=self.destroy)
+        self.btn_cls.pack(side=ctk.BOTTOM, pady=20, anchor="center")
+
     @classmethod
     def _get_def_icon(cls):
         return cls.DEFAULT_ICON.copy()
 
+
+# Need to restructure to UI Controller class,
+# Seperate out logic from fc_app, then put dumbed down class into ui builder module
+# Seperate out generic controls into their own section, these are marked to be moved
+# to a new repo of custom CTk UI components.
+class ui_factory():
+    def __init__(self, image_dir):
+        self.image_dir = image_dir
+
+
 if __name__ == "__main__":
-    a = fc_warn("TESTTITLE", "testbody")
+    a = fc_warn("testwarn", body="TESTbodaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", title="TESTTITLE", image_dir=r"C:\Users\KarmaThief\Desktop\OddFood\Web_Assets\FollowerCenobite\ProgramData\Images")
     a.mainloop()
