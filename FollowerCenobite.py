@@ -7,7 +7,7 @@ you to drill down and see your relationship with users across multiple
 accounts.
 """
 from FC_DBAccess import dbAccessor
-from FC_UI import fc_app, setup, warning
+from FC_UI import fc_app, setup, fc_warn
 
 
 class FollowerCenobite():
@@ -20,7 +20,7 @@ class FollowerCenobite():
             app = fc_app(self.dba)
             app.mainloop()
         else:
-            warning("Setup Failed, please try again.", "FC Setup Failed")
+            fc_warn("Setup Failed, please try again.", "FC Setup Failed")
 
 
 if __name__ == "__main__":
