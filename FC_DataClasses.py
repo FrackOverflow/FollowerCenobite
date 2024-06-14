@@ -15,32 +15,29 @@ class dbObj():
     Abstract superclass for all database objects.
     Adds meta fields and functions for database interactions.
     """
-    # Name of the database table
-    TABLE = "TABLE-NAME"
+    TABLE = "TABLE-NAME"        # Name of the database table
+    ID_COLS = ["id"]            # ID Column names
+    json_fields = []            # Fields converted to/from json
+    filter_fields = ["TABLE",   # Fields that aren't saved to the database
+                     "ID_COLS",
+                     "filter_fields",
+                     "json_fields"]
 
-    # ID Column names
-    ID_COLS = ["id"]
-
-    # Fields that aren't saved to the database
-    filter_fields = ["TABLE", "ID_COLS", "filter_fields", "json_fields"]
-
-    # Fields that have to be converted to/from json
-    json_fields = []
-
+    # Read-Only Property Accessors
     @classmethod
     def get_id_cols(cls):
         """ Gets the name of the ID column(s) for a dbObj."""
-        return list(cls.ID_COLS)
+        return cls.ID_COLS.copy()
 
     @classmethod
     def _get_filter_fields(cls):
         """ Gets the fields to filter out when saving to the database."""
-        return list(cls.filter_fields)
+        return cls.filter_fields.copy()
 
     @classmethod
     def get_json_fields(cls):
         """ Gets the fields to convert to/from json."""
-        return list(cls.json_fields)
+        return cls.json_fields.copy()
 
     @classmethod
     def get_table(cls):
