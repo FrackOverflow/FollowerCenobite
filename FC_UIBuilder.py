@@ -1,9 +1,16 @@
+"""
+FC_UIBuilder
+UIBuilder handles dumb presentation logic. Only FC_UI.py should reference 
+this module. This module should never interact with controller classes.
+"""
 import customtkinter as ctk
 
 
 class f_base(ctk.CTkFrame):
     """ Base class for FC frames."""
-    def __init__(self, *args, **kwargs):
+    def __init__(self,
+                 *args,
+                 **kwargs):
         super().__init__(*args, **kwargs)
 
 
@@ -24,21 +31,24 @@ class f_import(f_main):
 
         # 1x2 grid
         self.grid_rowconfigure(0, weight=1)
-        self.grid_columnconfigure(1, weight=1)
+        self.grid_columnconfigure(3, weight=1)
+
+        self._mk_import_detail()
+        self._mk_import_general()
+
+    def _mk_import_detail(self):
+        """ Makes import detail frame with Manual/Auto tabs."""
 
         # Import detail frame
         self.f_detail = ctk.CTkFrame(self, corner_radius=0)
-        self.f_detail.grid(row=0, column=0, sticky="nw")
+        self.f_detail.grid(row=0, column=0, sticky="nw", columnspan=3)
 
-        self._mk_import_tabv(self.f_detail)
-
-    def _mk_import_tabv(self, master):
-        self.import_tabview = ctk.CTkTabview(master)
-        self.import_tabview.pack()
+        self.import_tabview = ctk.CTkTabview(self.f_detail)
+        self.import_tabview.pack(side=ctk.LEFT)
         self.import_mantab = self.import_tabview.add("Manual")
         self.import_autotab = self.import_tabview.add("Auto")
 
-        # Setup grid layouts for each tab
+        # Manual Tab
         self.import_mantab.grid_columnconfigure(0, weight=1)
         self.import_mantab.grid_rowconfigure(1, weight=1)
         self.entr_flwg_man = fs_entry(lbl_text="Follower JSON: ", placeholder_text="Path/To/Followers.json", master=self.import_mantab)
@@ -46,33 +56,30 @@ class f_import(f_main):
         self.entr_flwr_man = fs_entry(lbl_text="Following JSON: ", placeholder_text="Path/To/Following.json", master=self.import_mantab)
         self.entr_flwr_man.grid(row=1, column=0, sticky="nw")
 
+        # Auto Tab
         self.import_autotab.grid_columnconfigure(0, weight=1)
         self.import_autotab.grid_rowconfigure(3, weight=1)
-
         self.entr_flwr_auto = label_entry(lbl_text="Follower Abbrv: ", placeholder_text="Follower File Abbrv", master=self.import_autotab)
         self.entr_flwr_auto.grid(row=0, column=0, sticky="nw")
-
         self.entr_flwg_auto = label_entry(lbl_text="Following Abbrv: ", placeholder_text="Following File Abbrv", master=self.import_autotab)
         self.entr_flwg_auto.grid(row=1, column=0, sticky="nw")
-
-        self.entr_date_format = label_entry(lbl_text="Date Format: ", master=self.import_autotab)
+        self.entr_date_format = label_entry(lbl_text="Date Format: ", placeholder_text="%d%M_%Y", master=self.import_autotab)
         self.entr_date_format.grid(row=2, column=0, sticky="nw")
-
-        self.btn_detect = ctk.CTkButton(self.import_autotab, text="Detect Files")
+        self.btn_detect = file_detect(self.entr_flwg_auto, self.entr_flwr_auto, self.entr_date_format, master=self.import_autotab)
         self.btn_detect.grid(row=3, column=0, sticky="nw")
 
+    def _mk_import_general(self):
+        # Setup General options frame
+        self.f_general = ctk.CTkFrame(self, corner_radius=0)
+        self.f_general.grid(row=0, column=3, sticky="e")
+        self.f_general.grid_columnconfigure(0, weight=1)
+        self.f_general.grid_rowconfigure(3, weight=1)
+        self.btn_run = ctk.CTkButton(self.f_general, text="Run")
+        self.btn_run.grid(row=3, column=0, sticky="s")
+
+        ### AUTO TAB NEEDS FOLDER TO LOOK IN, COULD ALSO USE FOR AMN TAB BUT NOT REALLY REQUIRED...
+        ### Add folder select to general pane and use it as a starting folder for man tab and a detect folder for auto tab
         """
-        # Auto Tab
-        # Flwr/Flwg prefix
-        # Detect Button
-
-
-        # Import general options
-        f_general = ctk.CTkFrame(self, corner_radius=0)
-        f_general.grid(row=0, column=1, sticky="ne")
-        # Column for global frame values
-        # Date format
-        # Data Folder
 
         #ctk.CTkLabel(f_general, text="GENERALIMPORT").pack()
         #ctk.CTkEntry(f_general).pack()
@@ -117,3 +124,28 @@ class fs_entry(label_entry):
             self.entry.delete(0, -1)
             self.entry.insert(0, path)
         return path
+
+
+class file_detect(f_base):
+    """ File detector button and output"""
+    def __init__(self,
+                 flwr_entry: fs_entry,
+                 flwg_entry: fs_entry,
+                 fdate_entry: fs_entry,
+                 *args,
+                 **kwargs):
+        super().__init__(*args, **kwargs)
+        self.btn_detect = ctk.CTkButton(self, text="Detect Files", command=self.detect_files)
+        self.btn_detect.pack(side=ctk.LEFT)
+        self.lbl_detect = ctk.CTkLabel(self, text="Files Detected: ")
+        self.lbl_detect.pack(side=ctk.LEFT)
+        self.flwr_entry = flwr_entry.entry.get
+        self.flwg_entry = flwg_entry.entry.get
+        self.fdate_entry = fdate_entry.entry.get
+
+    def detect_files(self):
+        flwg_abbr = self.flwg_entry()
+        flwr_abbr = self.flwr_entry()
+        f_date = self.fdate_entry()
+
+        print(f"ACC_{flwg_abbr}_{flwr_abbr}_{f_date}.json")
