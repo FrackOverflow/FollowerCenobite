@@ -1,7 +1,7 @@
 # ![FC_logo](https://github.com/FrackOverflow/FollowerCenobite/blob/main/ProgramData/Images/fc_logo.svg) FollowerCenobite
 FollowerCenobite is gives a detailed view of Instagram data over time. FC is not a bot, it consumes JSON data about follows/likes and allows you to drill down and see your relationship with users across multiple accounts.
 
-FC is currently under construction!!! To contribute see [contributing](https://github.com/FrackOverflow/FollowerCenobite/blob/main/Docs/Contributing/Contributing.md)
+$${\color{Orange}!!!FC \space is \space under \space construction!!!}$$ If you want to contribute, get started with the [contribution guide](https://github.com/FrackOverflow/FollowerCenobite/blob/main/Docs/Contributing/Contributing.md)
 
 ## The Main Idea
 Growing an instagram following requires managing a lot of relationships. After unfollowing one of my friends one too many times I decided to make FC. FC is a relationship manager, not a bot, an automated crawler, or anything that might get you banned. It doesn't even interact with Instagram (though some small interactions are planned on the roadmap).
