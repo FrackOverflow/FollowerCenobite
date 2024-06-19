@@ -58,10 +58,6 @@ def setup(dba: dbAccessor):
         return False
 
 
-# Need to restructure to UI Controller class,
-# Seperate out generic controls into their own section, these are marked to be moved
-# to a new repo of custom CTk UI components.
-# UI Factory will hold global values like fonts, DBA, etc
 class ui_factory():
     def __init__(self, dba: dbAccessor):
         self.dba = dba
