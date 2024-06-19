@@ -6,6 +6,7 @@ this module. This module should never interact with controller classes.
 This module is marked to be split into a seperate repo for reuse.
 Please make your code here as reusable as possible.
 """
+from datetime import datetime
 import customtkinter as ctk
 from PIL import Image
 import os
@@ -30,13 +31,15 @@ class label_entry(ctk.CTkFrame):
     def __init__(self,
                  lbl_text,
                  placeholder_text="",
+                 side=ctk.LEFT,
+                 fill=ctk.X,
                  *args,
                  **kwargs):
         super().__init__(*args, **kwargs)
         self.label = ctk.CTkLabel(self, text=lbl_text)
-        self.label.pack(side=ctk.LEFT)
+        self.label.pack(side=side)
         self.entry = ctk.CTkEntry(self, placeholder_text=placeholder_text)
-        self.entry.pack(side=ctk.LEFT)
+        self.entry.pack(side=side, fill=fill, expand=True)
 
 
 class fs_entry(label_entry):
@@ -46,17 +49,23 @@ class fs_entry(label_entry):
                  placeholder_text="",
                  dir_only=False,
                  btn_text="...",
+                 side=ctk.LEFT,
+                 initial_dir="",
                  *args,
                  **kwargs):
-        super().__init__(lbl_text=lbl_text, placeholder_text=placeholder_text, *args, **kwargs)
+        super().__init__(lbl_text=lbl_text, placeholder_text=placeholder_text, side=side, *args, **kwargs)
         kwargs.pop("master")
         self.dir_only = dir_only
         self.button = ctk.CTkButton(master=self, text=btn_text, command=self._fs_select, **kwargs)
-        self.button.pack(side=ctk.LEFT)
+        self.button.pack(side=side)
+        self.initial_dir = initial_dir
 
     def _fs_select(self):
         # Open file dialog and return selected file name
-        path = ctk.filedialog.askdirectory() if self.dir_only else ctk.filedialog.askopenfilename()
+        if self.initial_dir and os.path.isdir(self.initial_dir):
+            path = ctk.filedialog.askdirectory(self.initial_dir) if self.dir_only else ctk.filedialog.askopenfilename(self.initial_dir)
+        else:
+            path = ctk.filedialog.askdirectory() if self.dir_only else ctk.filedialog.askopenfilename()
         if path:
             self.entry.delete(0, -1)
             self.entry.insert(0, path)
@@ -66,26 +75,28 @@ class fs_entry(label_entry):
 class file_detect(ctk.CTkFrame):
     """ File detector button and output"""
     def __init__(self,
-                 flwr_entry: fs_entry,
-                 flwg_entry: fs_entry,
-                 fdate_entry: fs_entry,
+                 file_names=[],
+                 path="",
                  *args,
                  **kwargs):
         super().__init__(*args, **kwargs)
         self.btn_detect = ctk.CTkButton(self, text="Detect Files", command=self.detect_files)
-        self.btn_detect.pack(side=ctk.LEFT)
-        self.lbl_detect = ctk.CTkLabel(self, text="Files Detected: ")
-        self.lbl_detect.pack(side=ctk.LEFT)
-        self.flwr_entry = flwr_entry.entry.get
-        self.flwg_entry = flwg_entry.entry.get
-        self.fdate_entry = fdate_entry.entry.get
+        self.btn_detect.pack(side=ctk.BOTTOM, fill=ctk.X, expand=True)
+        self.lbl_detect = ctk.CTkLabel(self, text="Files Detected:\t", justify=ctk.LEFT)
+        self.lbl_detect.pack(side=ctk.TOP, fill=ctk.X, expand=True)
+        self.file_names = file_names
+        self.path = path
 
     def detect_files(self):
-        flwg_abbr = self.flwg_entry()
-        flwr_abbr = self.flwr_entry()
-        f_date = self.fdate_entry()
+        files = os.listdir(self.path)
+        count = 0
+        for f in files:
+            if os.path.isfile(os.path.join(self.path, f)) and f.endswith(".json") and f.startswith([self.file_names]):
+                count += 1
 
-        print(f"ACC_{flwg_abbr}_{flwr_abbr}_{f_date}.json")
+        self.lbl_detect.configure(True, text=f"Files Detected:\t{count}")
+        # TEST ME!
+        # Report files that match but date cannot be parsed
 
 
 class fc_dialogue(ctk.CTk):
@@ -143,7 +154,7 @@ class fc_warn(fc_dialogue):
     @classmethod
     def _get_def_icon(cls):
         return cls.DEFAULT_ICON.copy()
-# sendregion
+# endregion
 
 
 class f_base(ctk.CTkFrame):
@@ -278,61 +289,93 @@ class f_import(f_main):
 
         # 1x2 grid
         self.grid_rowconfigure(0, weight=1)
-        self.grid_columnconfigure(3, weight=1)
+        self.grid_columnconfigure(4, weight=1)
+        self.grid_columnconfigure(0, weight=2)
 
         self._mk_import_detail()
         self._mk_import_general()
+        self._register_events()
 
     def _mk_import_detail(self):
         """ Makes import detail frame with Manual/Auto tabs."""
 
         # Import detail frame
         self.f_detail = ctk.CTkFrame(self, corner_radius=0)
-        self.f_detail.grid(row=0, column=0, sticky="nw", columnspan=3)
+        self.f_detail.grid(row=0, column=0, sticky="nsew", columnspan=3)
 
         self.import_tabview = ctk.CTkTabview(self.f_detail)
-        self.import_tabview.pack(side=ctk.LEFT)
+        self.import_tabview.pack(side=ctk.RIGHT, fill=ctk.BOTH, expand=True)
         self.import_mantab = self.import_tabview.add("Manual")
         self.import_autotab = self.import_tabview.add("Auto")
 
         # Manual Tab
         self.import_mantab.grid_columnconfigure(0, weight=1)
-        self.import_mantab.grid_rowconfigure(1, weight=1)
-        self.entr_flwg_man = fs_entry(lbl_text="Follower JSON: ", placeholder_text="Path/To/Followers.json", master=self.import_mantab)
-        self.entr_flwg_man.grid(row=0, column=0, sticky="nw")
-        self.entr_flwr_man = fs_entry(lbl_text="Following JSON: ", placeholder_text="Path/To/Following.json", master=self.import_mantab)
-        self.entr_flwr_man.grid(row=1, column=0, sticky="nw")
+        self.import_mantab.grid_rowconfigure([0, 1], weight=0)
+        self.entr_flwg_man = fs_entry(lbl_text="Follower JSON\t", placeholder_text="Path/To/Followers.json", master=self.import_mantab)
+        self.entr_flwg_man.grid(row=0, column=0, sticky="new", padx=15, pady=20)
+        self.entr_flwr_man = fs_entry(lbl_text="Following JSON\t", placeholder_text="Path/To/Following.json", master=self.import_mantab)
+        self.entr_flwr_man.grid(row=1, column=0, sticky="new", padx=15, pady=20)
 
         # Auto Tab
         self.import_autotab.grid_columnconfigure(0, weight=1)
-        self.import_autotab.grid_rowconfigure(3, weight=1)
-        self.entr_flwr_auto = label_entry(lbl_text="Follower Abbrv: ", placeholder_text="Follower File Abbrv", master=self.import_autotab)
-        self.entr_flwr_auto.grid(row=0, column=0, sticky="nw")
-        self.entr_flwg_auto = label_entry(lbl_text="Following Abbrv: ", placeholder_text="Following File Abbrv", master=self.import_autotab)
-        self.entr_flwg_auto.grid(row=1, column=0, sticky="nw")
-        self.entr_date_format = label_entry(lbl_text="Date Format: ", placeholder_text="%d%M_%Y", master=self.import_autotab)
-        self.entr_date_format.grid(row=2, column=0, sticky="nw")
-        self.btn_detect = file_detect(self.entr_flwg_auto, self.entr_flwr_auto, self.entr_date_format, master=self.import_autotab)
-        self.btn_detect.grid(row=3, column=0, sticky="nw")
+        self.import_autotab.grid_rowconfigure([0, 1, 2], weight=0)
+        self.import_autotab.grid_rowconfigure([3, 4], weight=1)
 
+        self.entr_flwr_auto = label_entry(lbl_text="Follower Abbrv\t", placeholder_text="Follower File Abbrv", master=self.import_autotab)
+        self.entr_flwr_auto.grid(row=0, column=0, sticky="new", padx=15, pady=20)
+
+        self.entr_flwg_auto = label_entry(lbl_text="Following Abbrv\t", placeholder_text="Following File Abbrv", master=self.import_autotab)
+        self.entr_flwg_auto.grid(row=1, column=0, sticky="new", padx=15, pady=20)
+
+        # Date string must conform to https://docs.python.org/3/library/datetime.html#format-codes
+        self.entr_date_format = label_entry(lbl_text="Date Format\t", placeholder_text="%d%M_%Y", master=self.import_autotab)
+        self.entr_date_format.grid(row=2, column=0, sticky="new", padx=15, pady=20)
+        self.preview = ctk.CTkLabel(self.import_autotab, text="File Name Format\n\nFollower\nFollowing", justify=ctk.LEFT)
+        self.preview.grid(row=3, column=0, sticky="nws", padx=15, pady=20)
+        self.detect_frame = ctk.CTkFrame(self.import_autotab, corner_radius=0)
+        self.btn_detect = file_detect(self.entr_flwg_auto, self.entr_flwr_auto, self.entr_date_format, master=self.detect_frame)
+        self.btn_detect.pack(side=ctk.RIGHT)
+        self.detect_frame.grid(row=4, column=0, sticky="sw", padx=15, pady=20)
+        
+    def _register_events(self):
+        for event in ["<FocusOut>", "<Leave>", "<Enter>", "<Return>"]:
+            self.entr_flwg_auto.entry.bind(event, self.update_preview)
+            self.entr_flwr_auto.entry.bind(event, self.update_preview)
+            self.entr_date_format.entry.bind(event, self.update_preview)
+            self.entr_file_path.entry.bind(event, self.update_file_path)
+
+        # Wire up file detect
     def _mk_import_general(self):
         # Setup General options frame
         self.f_general = ctk.CTkFrame(self, corner_radius=0)
-        self.f_general.grid(row=0, column=3, sticky="e")
+        self.f_general.grid(row=0, column=4, sticky="nsew")
         self.f_general.grid_columnconfigure(0, weight=1)
         self.f_general.grid_rowconfigure(3, weight=1)
+
         self.btn_run = ctk.CTkButton(self.f_general, text="Run")
-        self.btn_run.grid(row=3, column=0, sticky="s")
+        self.btn_run.grid(row=3, column=0, sticky="s", padx=15, pady=15)
 
-        ### AUTO TAB NEEDS FOLDER TO LOOK IN, COULD ALSO USE FOR AMN TAB BUT NOT REALLY REQUIRED...
-        ### Add folder select to general pane and use it as a starting folder for man tab and a detect folder for auto tab
-        """
+        self.user_ddl = ctk.CTkOptionMenu(self.f_general, values=["User1", "User2", "User3"], command=self.update_preview)
+        self.user_ddl.grid(row=0, column=0, sticky="n", padx=15, pady=15)
 
-        #ctk.CTkLabel(f_general, text="GENERALIMPORT").pack()
-        #ctk.CTkEntry(f_general).pack()
-        #ctk.CTkLabel(f_detail, text="DETAILIMPORT").pack()
-        #ctk.CTkEntry(f_detail).pack()
-        """
+        self.entr_file_path = fs_entry("Data Folder\t", r"Path\To\Data\Folder\\", True, master=self.f_general, side=ctk.TOP)
+        self.entr_file_path.grid(row=1, column=0, sticky="n", padx=15, pady=15)
+
+    def update_file_path(self, _):
+        data_dir = self.entr_file_path.entry.get()
+        self.entr_flwg_man.initial_dir = data_dir
+        self.entr_flwg_man.initial_dir = data_dir
+        self.btn_detect.path = data_dir
+
+    def update_preview(self, _):
+        date_str = datetime.today().strftime(self.entr_date_format.entry.get())
+        suffix = f"{date_str}.json"
+        middle = f"_{self.user_ddl.get()}_"
+        flwr = self.entr_flwr_auto.entry.get()
+        flwg = self.entr_flwg_auto.entry.get()
+        preview_text = f"File Name Format\n\nFollower\t{flwr}{middle}{suffix}\nFollowing\t{flwg}{middle}{suffix}"
+        self.preview.configure(True, text=preview_text)
+        self.btn_detect.file_names = [f"{flwr}{middle}", f"{flwg}{middle}"]
 
 
 # Seperate into classes, remove DBA ------
