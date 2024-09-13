@@ -1,5 +1,5 @@
 # ![FC_logo](https://github.com/FrackOverflow/FollowerCenobite/blob/main/ProgramData/Images/fc_logo.svg) FollowerCenobite
-FollowerCenobite is gives a detailed view of Instagram data over time. FC is not a bot, it consumes JSON data about follows/likes and allows you to drill down and see your relationship with users across multiple accounts.
+FollowerCenobite gives a detailed view of Instagram data over time. FC is not a bot, it consumes JSON data about follows/likes and allows you to drill down and see your relationship with users across multiple accounts.
 
 $${\color{Orange}!!!FC \space is \space under \space construction!!!}$$ If you want to contribute, get started with the [contribution guide](https://github.com/FrackOverflow/FollowerCenobite/blob/main/Docs/Contributing/Contributing.md)
 
